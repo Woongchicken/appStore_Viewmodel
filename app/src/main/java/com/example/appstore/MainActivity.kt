@@ -17,7 +17,9 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 
 /*
-2. getParcelableExtra으로 데이터 직렬화*/
+8/1 commit
+*Todos
+1. getParcelableExtra으로 데이터 직렬화*/
 
 class MainActivity : AppCompatActivity() {
 
