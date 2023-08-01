@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/com_rowid"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" android:paddingTop="10dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="5dp"
+    android:weightSum="4">
+
+    <TextView
+        android:id="@+id/rateTextView1"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:textColor="@color/appstore_gray"
+        android:textSize="18dp"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <TextView
+        android:id="@+id/rateTextView2"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:textColor="@color/appstore_gray"
+        android:textSize="36dp"
+        android:maxLines="1"/>
+
+    <RatingBar
+        android:id="@+id/rateRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="0.5"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:scaleX="0.9"
+        android:scaleY="0.9"
+        android:layout_gravity="center_horizontal"
+        style="@style/Widget.AppCompat.RatingBar.Small" />
+
+</LinearLayout>
+

@@ -1,0 +1,15 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.AppStore" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/appstore_primary</item>
+        <item name="colorPrimaryDark">@color/appstore_primary_dark</item>
+        <item name="colorAccent">@color/appstore_accent</item>
+        <item name="color">@color/appstore_gray</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <color name="appstore_primary">#3F51B5</color>
+    <color name="appstore_primary_dark">#303F9F</color>
+    <color name="appstore_accent">#FF4081</color>
+    <color name="appstore_gray">#808080</color>
+</resources>

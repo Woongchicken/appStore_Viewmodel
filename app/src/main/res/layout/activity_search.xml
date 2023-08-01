@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="5dp"
+    tools:context=".SearchActivity">
+
+    <LinearLayout
+        android:id="@+id/searchLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/searchButton"
+            android:src="@drawable/saerc_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:completionHint="검색어를 입력하세요."
+            android:completionThreshold="1"
+            android:hint="게임, 앱, 스토리 등"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
+            android:textSize="20sp">
+        </AutoCompleteTextView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/saerchResult"
+        android:layout_below="@+id/searchLinearLayout"
+        android:layout_above="@+id/bottomLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:clickable="true"
+        android:text="검색 결과 없음"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_below="@+id/searchLinearLayout"
+        android:layout_above="@+id/bottomLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"/>
+
+
+    <LinearLayout
+        android:id="@+id/bottomLinearLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/todayLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/today"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:tint="@color/appstore_gray"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="투데이"
+                android:textSize="20sp"
+                android:textColor="@color/appstore_gray"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gameLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/game"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:tint="@color/appstore_gray"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="게임"
+                android:textSize="20sp"
+                android:textColor="@color/appstore_gray"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/appLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/app"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:tint="@color/appstore_gray"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="앱"
+                android:textSize="20sp"
+                android:textColor="@color/appstore_gray"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/arcadeLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/arcade"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:tint="@color/appstore_gray"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Arcade"
+                android:textSize="20sp"
+                android:textColor="@color/appstore_gray"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/searchingLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:src="@drawable/saerc_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:tint="@color/appstore_gray"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="게임"
+                android:textSize="20sp"
+                android:textColor="@color/appstore_gray"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
