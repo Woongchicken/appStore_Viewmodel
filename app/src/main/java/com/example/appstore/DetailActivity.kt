@@ -1,7 +1,10 @@
 package com.example.appstore
 
+import android.content.Intent
+import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -18,14 +21,25 @@ class DetailActivity : AppCompatActivity() {
         ActivityDetailBinding.inflate(layoutInflater)
     }
 
+    inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
+        SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)
+        else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val result = intent.getSerializableExtra("result") as ApiResult
+        // Serializable로 전달된 ApiResult를 Intent에서 받아옴.
+        // val result = intent.getSerializableExtra("result") as ApiResult
 
-        setInit(result)   // 초기 셋팅
+        // Parcelable로 전달된 ApiResult를 Intent에서 받아옴.
+          val result = intent.parcelable("result") as ApiResult?
+
+        //val result = intent.getParcelableExtra("result") as ApiResult?
+
+        setInit(result)  // 초기 셋팅
 
         /* 앱 버전 '더보기' 버튼*/
         binding.showMoreButtonFunction.setOnClickListener {
@@ -37,6 +51,18 @@ class DetailActivity : AppCompatActivity() {
             toggleAppDescription()     // 전체 내용을 펼치거나 숨기는 작업
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isViewReady()) {
+            setNewFunctionButton()
+            setDescription()
+        }
+    }
+
+    private fun isViewReady(): Boolean {
+        return binding.root.width > 0 && binding.root.height > 0
     }
 
     /*      onResume - 액티비티가 포그라운드로 나타날 때 호출
@@ -75,7 +101,7 @@ class DetailActivity : AppCompatActivity() {
 
 
     /** 초기 세팅 */
-    private fun setInit(result : ApiResult) {
+    private fun setInit(result : ApiResult?) {
         if (result != null ){        // 검색 결과가 있을 경우
             bindData(result)      // 검색 결과 바인딩
         }

@@ -1,7 +1,10 @@
 package com.example.appstore
 
+import android.content.Intent
+import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.KeyEvent
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,14 +26,23 @@ class SearchActivity : AppCompatActivity() {
         roomDatabase.mainDao()
     }
 
+    inline fun <reified T : Parcelable> Intent.parcelableArrayList(key: String): ArrayList<T>? = when {
+        SDK_INT >= 33 -> getParcelableArrayListExtra(key, T::class.java)
+        else -> @Suppress("DEPRECATION") getParcelableArrayListExtra(key)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val resultList = intent.getSerializableExtra("resultList") as List<ApiResult>
+        // Serializable로 전달된 ApiResult리스트를 Intent에서 받아옴.
+        //val resultList = intent.getSerializableExtra("resultList") as List<ApiResult>
 
-        setInit(resultList)   // 초기 셋팅
+        // Parcelable로 전달된 ApiResult리스트를 Intent에서 받아옴.
+        //val resultList = intent.parcelableArrayList<ApiResult>("resultList") as List<ApiResult>
+
+        setInit()   // 초기 셋팅
 
         /* 검색창 클릭할때마다 검색어 자동 완성 매서드 호출 */
         binding.autoCompleteTextView.setOnClickListener {
@@ -56,11 +68,10 @@ class SearchActivity : AppCompatActivity() {
     }
 
     /** 초기 세팅 */
-    private fun setInit(resultList : List<ApiResult>) {
+    private fun setInit() {
         Utils.countSearching = 0            // 중복 검색 방지 변수 초기화
         searchTermAuto()                    // 검색어 자동 완성
-        setVisibility(resultList)           // 검색 결과에 따라 레이아웃 가시성 설정
-        setSearchAdapter(resultList)        // 검색 결과 Adapter 세팅
+        setVisibility()           // 검색 결과에 따라 레이아웃 가시성 설정
     }
 
     /** 검색어 자동 완성 Adapter 세팅 */
@@ -68,22 +79,22 @@ class SearchActivity : AppCompatActivity() {
         val adapter = Utils.searchTermAuto(this, mainDao)
         binding.autoCompleteTextView.setAdapter(adapter)
     }
-
     /** 검색 결과에 따라 레이아웃 가시성 설정 */
-    private fun setVisibility(resultList : List<ApiResult>) {
-        if (resultList.isNullOrEmpty()) {   // 검색 결과가 없을 경우
+    private fun setVisibility() {
+        if (Utils.resultList.isNullOrEmpty()) {   // 검색 결과가 없을 경우
             binding.saerchResult.visibility = View.VISIBLE
             binding.bottomLinearLayout.visibility = View.GONE
         } else {                            // 검색 결과가 있을 경우
             binding.saerchResult.visibility = View.GONE
             binding.bottomLinearLayout.visibility = View.VISIBLE
+            setSearchAdapter()        // 검색 결과 Adapter 세팅
         }
     }
 
     /** 검색 결과 Adapter 세팅 */
-    private fun setSearchAdapter(resultList: List<ApiResult>){
+    private fun setSearchAdapter(){
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = SearchAdapter(resultList)
+        binding.recyclerView.adapter = SearchAdapter(Utils.resultList!!)
     }
 
 }

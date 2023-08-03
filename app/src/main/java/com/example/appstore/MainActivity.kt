@@ -17,9 +17,15 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 
 /*
-8/1 commit (코드리팩터링)
-*Todos
-1. getParcelableExtra으로 데이터 직렬화*/
+
+8/3 commit (resultList - Utils 전역변수 선언)
+
+* 할 일
+1. 코루틴
+2. onWindowFocusChanged()
+3. 페이지 로딩 느림 -> 페이지 갯수 제한
+
+*/
 
 class MainActivity : AppCompatActivity() {
 
@@ -92,10 +98,10 @@ class MainActivity : AppCompatActivity() {
 
     /** 마지막 검색 목록 Adapter 세팅 */
     private fun setRecentAdapter() {
-        val resultList = Utils.setRecomend(mainDao)
-        if (!(resultList.isNullOrEmpty())) {
+        Utils.setRecomend(mainDao)
+        if (!(Utils.resultList.isNullOrEmpty())) {
             binding.recomendRecyclerView.layoutManager = LinearLayoutManager(this)
-            binding.recomendRecyclerView.adapter = RecomendAdapter(resultList)
+            binding.recomendRecyclerView.adapter = RecomendAdapter(Utils.resultList!!)
         }
     }
 

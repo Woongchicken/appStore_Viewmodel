@@ -1,6 +1,9 @@
 package com.example.appstore.Retrofit2
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
+import kotlinx.parcelize.Parcelize
+
 import java.io.Serializable
 
 data class SearchAppDataDto (
@@ -11,7 +14,8 @@ data class SearchAppDataDto (
     val results: List<ApiResult>?
 )
 
-data class ApiResult(
+@Parcelize
+ data class ApiResult(
     /* 아이콘 */
     @field:Json(name = "artworkUrl512")
     val artworkUrl512: String?,
@@ -52,4 +56,5 @@ data class ApiResult(
     @field:Json(name = "releaseNotes")
     val releaseNotes: String?
 
-) : Serializable
+) : Parcelable
+
