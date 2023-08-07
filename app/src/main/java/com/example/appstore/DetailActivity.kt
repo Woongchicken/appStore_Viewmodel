@@ -5,6 +5,7 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -37,8 +38,6 @@ class DetailActivity : AppCompatActivity() {
         // Parcelable로 전달된 ApiResult를 Intent에서 받아옴.
           val result = intent.parcelable("result") as ApiResult?
 
-        //val result = intent.getParcelableExtra("result") as ApiResult?
-
         setInit(result)  // 초기 셋팅
 
         /* 앱 버전 '더보기' 버튼*/
@@ -53,20 +52,10 @@ class DetailActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (isViewReady()) {
-            setNewFunctionButton()
-            setDescription()
-        }
-    }
 
-    private fun isViewReady(): Boolean {
-        return binding.root.width > 0 && binding.root.height > 0
-    }
 
-    /*      onResume - 액티비티가 포그라운드로 나타날 때 호출
-            onWindowFocusChanged() - 액티비티의 창이 포커스를 얻거나 잃을 때 호출
+    /*      onResume - 액티비티가 포그라운드로 나타날 때 호출 (백그라운드 상태를 체크)
+            onWindowFocusChanged() - 액티비티의 창이 포커스를 얻거나 잃을 때 호출 (onWindowFocusChasnged()를 가지고있는 Activity 가 최상단 인지 체크)
 
             onResume - 뷰의 상태를 확인하기 전에 실행될 수 있음. 이 경우에는 뷰가 아직 준비되지 않았을 수 있으므로 올바른 동작을 보장하지 않을 수 있음. -> 뷰의 준비 상태를 확인하고 호출
 
@@ -91,7 +80,9 @@ class DetailActivity : AppCompatActivity() {
             2) 앱이 포그라운드로 나타났을 때 특정한 UI 업데이트를 해야 할 때
             3) 앱이 포커스를 잃었을 때 작업을 일시 중지하거나 저장해야 할 때     */
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {      // hasFocus : true - 윈도우가 포커스를 받은 상태, false - 윈도우가 포커스를 잃은 상태
+
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {      // hasFocus : true - 윈도우가 포커스를 받은 상태(포그라운드 상태), false - 윈도우가 포커스를 잃은 상태(백그라운드 상태)
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) {
             setNewFunctionButton()

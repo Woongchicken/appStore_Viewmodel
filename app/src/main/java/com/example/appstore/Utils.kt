@@ -26,6 +26,7 @@ import java.util.Date
 
 object Utils {
     var countSearching : Int = 0        // 중복 검색 방지 변수
+    var isSearching : Boolean = false   // 중복 방지 변수
     var resultList: List<ApiResult>? = null       // 검색 결과 리스트
 
 
@@ -38,32 +39,40 @@ object Utils {
     }
 
     /** 검색 버튼을 눌렀을 때 (실제 검색 행위를 수행) */
-    fun requestSearch(context: Context, searchTerm: String, mainDao: MainDao) {
-        if (countSearching == 0) {       // 검색버튼 중복으로 눌렀는지 체크
-            countSearching++
-            searchApp(searchTerm,mainDao)    // api 호출하여 검색 결과 얻음.
-            startSearchActivity(context)          // 검색 결과 페이지로 이동
+    fun requestSearch(context: Context, searchTerm: String, mainDao: MainDao)  {
+        CoroutineScope(Dispatchers.Main).launch {
+            if (countSearching == 0) {       // 검색버튼 중복으로 눌렀는지 체크
+                countSearching++
+                searchApp(searchTerm, mainDao)    // api 호출하여 검색 결과 얻음.
+                startSearchActivity(context)          // 검색 결과 페이지로 이동
+            }
         }
     }
 
     /** 검색 기능 (검색 결과 반환만 필요한 경우) */
-    fun searchApp(searchTerm: String, mainDao: MainDao) = runBlocking{
-        async{
-            callApi(searchTerm)
-        }.await()
+
+
+
+    suspend fun searchApp(searchTerm: String, mainDao: MainDao) = withContext(Dispatchers.IO) {
+        callApi(searchTerm)
 
         val date = Date()
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
         /* 검색어 히스토리에 기록 */
-        if (!(searchTerm.trim().isNullOrEmpty()) && !(resultList.isNullOrEmpty())){ // 1. 검색어가 없을 경우(공백) 2. 검색 결과가 없을 경우  -> 검색어 히스토리에 안 남김.
+        if (!(searchTerm.trim()
+                .isNullOrEmpty()) && !(resultList.isNullOrEmpty())
+        ) { // 1. 검색어가 없을 경우(공백) 2. 검색 결과가 없을 경우  -> 검색어 히스토리에 안 남김.
             val history = HistoryEntity(searchTerm, formatter.format(date))
             mainDao.setInsertHistory(history)
         }
     }
 
+
+
     /** API 호출 */
-    private suspend fun callApi(searchTerm: String) = withContext(Dispatchers.IO) {
+    private fun callApi(searchTerm: String)  {
+        Log.d("마지막 검색 목록","Utils - callApi(1) [${Thread.currentThread().name}]")
         val call = ApiObject.getRetrofitService.getApp(searchTerm)
         try {
             val response = call.execute()
@@ -87,32 +96,35 @@ object Utils {
                         releaseNotes = result.releaseNotes ?: " "
                     )
                 }
+                Log.d("마지막 검색 목록","Utils - callApi(2) [${Thread.currentThread().name}]")
                 Log.d("Utils.callAPI","API호출 성공 / resultList : ${resultList}")
             }
             Log.d("Utils.callAPI","API 호출 실패 / emptyList() ")
         } catch (e: Exception) {
             Log.e(TAG, e.message.toString())
         }
+        Log.d("마지막 검색 목록","Utils - callApi(3) [${Thread.currentThread().name}]")
     }
 
 
+
+
+
     /** 최근 검색 결과 반환  */
-    fun setRecomend(mainDao: MainDao) = runBlocking {
+    suspend fun setRecomend(mainDao: MainDao) = withContext(Dispatchers.IO) {
         val history: HistoryEntity? = mainDao.getHistoryRecent()
         var searchTerm = history?.searchTerm ?: "apple" // 최근 검색어가 없으면 검색어 'apple'로 설정
 
-        async{
-            callApi(searchTerm)
-        }.await()
+        Log.d("마지막 검색 목록","Utils - setRecomend(1) [${Thread.currentThread().name}]")
+        callApi(searchTerm)
+        Log.d("마지막 검색 목록","Utils - setRecomend(2) [${Thread.currentThread().name}]")
 
         /* 최근 검색어로 검색한 결과, 결과가 없을 경우  */
         if (resultList.isNullOrEmpty()) {
             searchTerm = "apple"    // 검색어 'apple'로 설정 후 재 검색
-            async{
-                callApi(searchTerm)
-            }.await()
+            callApi(searchTerm)
+            Log.d("마지막 검색 목록","Utils - setRecomend(3) [${Thread.currentThread().name}]")
         }
-
     }
 
 
@@ -130,9 +142,6 @@ object Utils {
 //        intent.putExtra("resultList", resultList as Serializable)
 //        intent.putExtra("resultList", resultList as ArrayList<Parcelable>)
         context.startActivity(intent)
-
-
-
     }
 
 }

@@ -3,10 +3,12 @@ package com.example.appstore
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.sqlite.db.SupportSQLiteCompat.Api16Impl.cancel
 import com.example.appstore.Adapter.HistoryAdapter
 import com.example.appstore.Adapter.RecomendAdapter
 import com.example.appstore.Retrofit2.ApiResult
@@ -14,16 +16,21 @@ import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
 import com.example.appstore.Room.RoomDB
 import com.example.appstore.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 
 /*
 
-8/3 commit (resultList - Utils 전역변수 선언)
+8/7 commit
 
 * 할 일
-1. 코루틴
-2. onWindowFocusChanged()
-3. 페이지 로딩 느림 -> 페이지 갯수 제한
+1. isSearching 안되는 이유 찾기
+2. 페이지 로딩 느림 -> 페이지 갯수 제한
+
 
 */
 
@@ -98,10 +105,15 @@ class MainActivity : AppCompatActivity() {
 
     /** 마지막 검색 목록 Adapter 세팅 */
     private fun setRecentAdapter() {
-        Utils.setRecomend(mainDao)
-        if (!(Utils.resultList.isNullOrEmpty())) {
-            binding.recomendRecyclerView.layoutManager = LinearLayoutManager(this)
-            binding.recomendRecyclerView.adapter = RecomendAdapter(Utils.resultList!!)
+        CoroutineScope(Dispatchers.Main).launch {
+            Log.d("마지막 검색 목록","MainActivity - setRecentAdapter(1) [${Thread.currentThread().name}]")
+            Utils.setRecomend(mainDao)
+            Log.d("마지막 검색 목록","MainActivity - setRecentAdapter(2) [${Thread.currentThread().name}]")
+
+            if (!(Utils.resultList.isNullOrEmpty())) {
+                binding.recomendRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                binding.recomendRecyclerView.adapter = RecomendAdapter(Utils.resultList!!)
+            }
         }
     }
 
