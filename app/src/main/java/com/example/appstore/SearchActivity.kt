@@ -5,8 +5,11 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Parcelable
+import android.os.SystemClock
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appstore.Adapter.SearchAdapter
 import com.example.appstore.Retrofit2.ApiResult
@@ -25,6 +28,9 @@ class SearchActivity : AppCompatActivity() {
     private val mainDao: MainDao by lazy {
         roomDatabase.mainDao()
     }
+    private var mLastClickTime : Long = 0    // Click 키 입력 시간 저장 변수
+    private var mLastEnterTime : Long = 0    // Enter 키 입력 시간 저장 변수
+
 
     inline fun <reified T : Parcelable> Intent.parcelableArrayList(key: String): ArrayList<T>? = when {
         SDK_INT >= 33 -> getParcelableArrayListExtra(key, T::class.java)
@@ -49,27 +55,39 @@ class SearchActivity : AppCompatActivity() {
             searchTermAuto()
         }
 
-        /* 검색 버튼 클릭하여 검색 */
+        /* 검색 버튼 클릭 이벤트 처리 */
         binding.searchButton.setOnClickListener {
-            val searchTerm = binding.autoCompleteTextView.text.toString()
-            Utils.requestSearch(this,searchTerm,mainDao) // 검색
+            if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) {    // 클릭한 시간 차를 계산
+                val searchTerm = binding.autoCompleteTextView.text.toString()
+                Utils.requestSearch(this, searchTerm, mainDao) // 검색
+            }
+            mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
         }
 
         /* Enter 키 입력 이벤트 처리 */
-        binding.autoCompleteTextView.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                val searchTerm = binding.autoCompleteTextView.text.toString()
-                Utils.requestSearch(this,searchTerm,mainDao) // 검색
-                return@setOnKeyListener true
+        binding.autoCompleteTextView.inputType = EditorInfo.TYPE_CLASS_TEXT
+        binding.autoCompleteTextView.maxLines=1  // multiple line 제거
+        binding.autoCompleteTextView.imeOptions = EditorInfo.IME_ACTION_SEARCH // Enter키 대신 돋보기가 나타남.
+
+        binding.autoCompleteTextView.setOnEditorActionListener { _, actionId, event ->
+            // 소프트 키보드의 "검색" 버튼이나 하드웨어 키보드의 Enter 키를 눌렀을 때
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                if (SystemClock.elapsedRealtime() - mLastEnterTime > 5000) {  // Enter 키 입력한 시간 차를 계산
+
+                    val searchTerm = binding.autoCompleteTextView.text.toString()
+                    Utils.requestSearch(this, searchTerm, mainDao) // 검색
+
+                    mLastEnterTime = SystemClock.elapsedRealtime()
+                    return@setOnEditorActionListener true
+                }
             }
-            return@setOnKeyListener false
+            return@setOnEditorActionListener false
         }
 
     }
 
     /** 초기 세팅 */
     private fun setInit() {
-        Utils.countSearching = 0            // 중복 검색 방지 변수 초기화
         searchTermAuto()                    // 검색어 자동 완성
         setVisibility()           // 검색 결과에 따라 레이아웃 가시성 설정
     }
@@ -82,9 +100,11 @@ class SearchActivity : AppCompatActivity() {
     /** 검색 결과에 따라 레이아웃 가시성 설정 */
     private fun setVisibility() {
         if (Utils.resultList.isNullOrEmpty()) {   // 검색 결과가 없을 경우
+            Log.d("검색 결과 테스트", "setVisibility(1) - ${Utils.resultList}")
             binding.saerchResult.visibility = View.VISIBLE
             binding.bottomLinearLayout.visibility = View.GONE
-        } else {                            // 검색 결과가 있을 경우
+        } else {    // 검색 결과가 있을 경우
+            Log.d("검색 결과 테스트", "setVisibility(2) - ${Utils.resultList}")
             binding.saerchResult.visibility = View.GONE
             binding.bottomLinearLayout.visibility = View.VISIBLE
             setSearchAdapter()        // 검색 결과 Adapter 세팅

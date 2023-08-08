@@ -1,6 +1,8 @@
 package com.example.appstore.Adapter
 
 import android.content.Intent
+import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +20,7 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
     RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     private val maxItemCount = 6        // 최대 데이터 표시 갯수
+    private var mLastClickTime : Long = 0    // Click 키 입력 시간 저장 변수
 
     /* 뷰 홀더 생성 (호출되는 횟수가 정해져있음) */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -42,7 +45,10 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
         fun bind(history: HistoryEntity) {
             binding.searchTerm.text = history.searchTerm
             binding.comRowid.setOnClickListener {
-                Utils.requestSearch(binding.root.context,history.searchTerm,mainDao) // 검색
+                if (SystemClock.elapsedRealtime() - mLastClickTime > 2000) { // 클릭한 시간 차를 계산
+                    Utils.requestSearch(binding.root.context, history.searchTerm, mainDao) // 검색
+                }
+                mLastClickTime = SystemClock.elapsedRealtime()
             }
         }
     }

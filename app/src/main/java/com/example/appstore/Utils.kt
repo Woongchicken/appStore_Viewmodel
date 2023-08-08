@@ -25,8 +25,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 object Utils {
-    var countSearching : Int = 0        // 중복 검색 방지 변수
-    var isSearching : Boolean = false   // 중복 방지 변수
     var resultList: List<ApiResult>? = null       // 검색 결과 리스트
 
 
@@ -41,11 +39,8 @@ object Utils {
     /** 검색 버튼을 눌렀을 때 (실제 검색 행위를 수행) */
     fun requestSearch(context: Context, searchTerm: String, mainDao: MainDao)  {
         CoroutineScope(Dispatchers.Main).launch {
-            if (countSearching == 0) {       // 검색버튼 중복으로 눌렀는지 체크
-                countSearching++
-                searchApp(searchTerm, mainDao)    // api 호출하여 검색 결과 얻음.
-                startSearchActivity(context)          // 검색 결과 페이지로 이동
-            }
+            searchApp(searchTerm, mainDao)    // api 호출하여 검색 결과 얻음.
+            startSearchActivity(context)          // 검색 결과 페이지로 이동
         }
     }
 
@@ -72,6 +67,7 @@ object Utils {
 
     /** API 호출 */
     private fun callApi(searchTerm: String)  {
+        resultList = emptyList()    // 결과 값 list 초기화
         Log.d("마지막 검색 목록","Utils - callApi(1) [${Thread.currentThread().name}]")
         val call = ApiObject.getRetrofitService.getApp(searchTerm)
         try {
