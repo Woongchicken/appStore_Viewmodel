@@ -16,8 +16,10 @@ import com.example.appstore.databinding.ActivitySearchBinding
 import com.example.appstore.databinding.ItemSearchBinding
 import java.io.Serializable
 
-class SearchAdapter(private val resultList: List<ApiResult>) :
+class SearchAdapter() :
     RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
+
+    private val resultList: MutableList<ApiResult> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         return SearchViewHolder(
@@ -59,6 +61,15 @@ class SearchAdapter(private val resultList: List<ApiResult>) :
             }
         }
 
+    }
+
+    fun setList(apiResultList: List<ApiResult>) {
+        Log.d("무한 스크롤", "NoticeAdapter - setList() - apiResultList : $apiResultList")
+        resultList.addAll(apiResultList)
+    }
+    fun deleteLoading(){
+        Log.d("무한 스크롤", "NoticeAdapter - deleteLoading()")
+        resultList.removeAt(resultList.lastIndex)
     }
 }
 

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Parcelable
 import android.util.Log
 import android.widget.ArrayAdapter
+import androidx.lifecycle.ViewModelProvider
 import com.example.appstore.Retrofit2.ApiObject
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.Room.HistoryEntity
@@ -25,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 object Utils {
-    var resultList: List<ApiResult>? = null       // 검색 결과 리스트
+     var resultList: List<ApiResult>? = null       // 검색 결과 리스트
 
 
     /** 검색어 자동 완성 */
@@ -37,26 +38,22 @@ object Utils {
     }
 
     /** 검색 버튼을 눌렀을 때 (실제 검색 행위를 수행) */
-    fun requestSearch(context: Context, searchTerm: String, mainDao: MainDao)  {
+    fun requestSearch(context: Context, searchTerm: String, mainDao: MainDao, model: MainViewModel)  {
         CoroutineScope(Dispatchers.Main).launch {
-            searchApp(searchTerm, mainDao)    // api 호출하여 검색 결과 얻음.
+            searchApp(searchTerm, mainDao, model)    // api 호출하여 검색 결과 얻음.
             startSearchActivity(context)          // 검색 결과 페이지로 이동
         }
     }
 
     /** 검색 기능 (검색 결과 반환만 필요한 경우) */
-
-
-
-    suspend fun searchApp(searchTerm: String, mainDao: MainDao) = withContext(Dispatchers.IO) {
-        callApi(searchTerm)
+    suspend fun searchApp(searchTerm: String, mainDao: MainDao, model: MainViewModel) = withContext(Dispatchers.IO) {
+        model.callApi(searchTerm)
 
         val date = Date()
         val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
         /* 검색어 히스토리에 기록 */
-        if (!(searchTerm.trim()
-                .isNullOrEmpty()) && !(resultList.isNullOrEmpty())
+        if (!(searchTerm.trim().isNullOrEmpty()) && !(model.resultList.value.isNullOrEmpty())
         ) { // 1. 검색어가 없을 경우(공백) 2. 검색 결과가 없을 경우  -> 검색어 히스토리에 안 남김.
             val history = HistoryEntity(searchTerm, formatter.format(date))
             mainDao.setInsertHistory(history)
@@ -64,61 +61,19 @@ object Utils {
     }
 
 
-
-    /** API 호출 */
-    private fun callApi(searchTerm: String)  {
-        resultList = emptyList()    // 결과 값 list 초기화
-        Log.d("마지막 검색 목록","Utils - callApi(1) [${Thread.currentThread().name}]")
-        val call = ApiObject.getRetrofitService.getApp(searchTerm)
-        try {
-            val response = call.execute()
-            val results = response.body()?.results
-
-            if (results.isNullOrEmpty()) {
-                Log.d("Utils.callAPI","API호출 실패 / isNullOrEmpty : ${results}")
-            } else {
-                Log.d("Utils.callAPI","API호출 성공 / results : ${results}")
-                resultList = results.map { result ->
-                    ApiResult(
-                        artworkUrl512 = result.artworkUrl512 ?: " ",
-                        trackName = result.trackName ?: " ",
-                        averageUserRating = result.averageUserRating ?: 0f,
-                        screenshotUrls = result.screenshotUrls,
-                        description = result.description ?: " ",
-                        trackContentRating = result.trackContentRating ?: " ",
-                        artistName = result.artistName ?: " ",
-                        userRatingCount = result.userRatingCount ?: " ",
-                        primaryGenreName = result.primaryGenreName ?: " ",
-                        releaseNotes = result.releaseNotes ?: " "
-                    )
-                }
-                Log.d("마지막 검색 목록","Utils - callApi(2) [${Thread.currentThread().name}]")
-                Log.d("Utils.callAPI","API호출 성공 / resultList : ${resultList}")
-            }
-            Log.d("Utils.callAPI","API 호출 실패 / emptyList() ")
-        } catch (e: Exception) {
-            Log.e(TAG, e.message.toString())
-        }
-        Log.d("마지막 검색 목록","Utils - callApi(3) [${Thread.currentThread().name}]")
-    }
-
-
-
-
-
     /** 최근 검색 결과 반환  */
-    suspend fun setRecomend(mainDao: MainDao) = withContext(Dispatchers.IO) {
+    suspend fun setRecomend(mainDao: MainDao, model: MainViewModel) = withContext(Dispatchers.IO) {
         val history: HistoryEntity? = mainDao.getHistoryRecent()
         var searchTerm = history?.searchTerm ?: "apple" // 최근 검색어가 없으면 검색어 'apple'로 설정
 
         Log.d("마지막 검색 목록","Utils - setRecomend(1) [${Thread.currentThread().name}]")
-        callApi(searchTerm)
+        model.callApi(searchTerm)
         Log.d("마지막 검색 목록","Utils - setRecomend(2) [${Thread.currentThread().name}]")
 
         /* 최근 검색어로 검색한 결과, 결과가 없을 경우  */
         if (resultList.isNullOrEmpty()) {
             searchTerm = "apple"    // 검색어 'apple'로 설정 후 재 검색
-            callApi(searchTerm)
+            model.callApi(searchTerm)
             Log.d("마지막 검색 목록","Utils - setRecomend(3) [${Thread.currentThread().name}]")
         }
     }

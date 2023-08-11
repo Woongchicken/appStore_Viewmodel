@@ -48,7 +48,7 @@
         android:textStyle="bold"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/searchRecyclerView"
         android:layout_below="@+id/searchLinearLayout"
         android:layout_above="@+id/bottomLinearLayout"
         android:layout_width="match_parent"

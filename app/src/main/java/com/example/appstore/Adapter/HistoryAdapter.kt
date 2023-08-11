@@ -5,8 +5,10 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appstore.DetailActivity
+import com.example.appstore.MainViewModel
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
@@ -16,11 +18,12 @@ import com.example.appstore.databinding.ActivityMainBinding
 import com.example.appstore.databinding.ItemHistoryBinding
 import java.io.Serializable
 
-class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private val mainDao: MainDao) :
+class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private val mainDao: MainDao, private var model : MainViewModel) :
     RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     private val maxItemCount = 6        // 최대 데이터 표시 갯수
     private var mLastClickTime : Long = 0    // Click 키 입력 시간 저장 변수
+
 
     /* 뷰 홀더 생성 (호출되는 횟수가 정해져있음) */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
@@ -46,7 +49,7 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
             binding.searchTerm.text = history.searchTerm
             binding.comRowid.setOnClickListener {
                 if (SystemClock.elapsedRealtime() - mLastClickTime > 2000) { // 클릭한 시간 차를 계산
-                    Utils.requestSearch(binding.root.context, history.searchTerm, mainDao) // 검색
+                    Utils.requestSearch(binding.root.context, history.searchTerm, mainDao, model) // 검색
                 }
                 mLastClickTime = SystemClock.elapsedRealtime()
             }

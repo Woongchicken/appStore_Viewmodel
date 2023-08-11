@@ -1,6 +1,7 @@
 package com.example.appstore.Adapter
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -13,8 +14,10 @@ import com.example.appstore.databinding.ItemHistoryBinding
 import com.example.appstore.databinding.ItemRecomendBinding
 import java.io.Serializable
 
-class RecomendAdapter(private val resultList: List<ApiResult>) :
+class RecomendAdapter :
     RecyclerView.Adapter<RecomendAdapter.RecomendViewHolder>() {
+    private val resultList: MutableList<ApiResult> = mutableListOf()
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecomendViewHolder {
         return RecomendViewHolder(
@@ -49,4 +52,14 @@ class RecomendAdapter(private val resultList: List<ApiResult>) :
         }
 
     }
+
+    fun setList(apiResultList: List<ApiResult>) {
+        Log.d("무한 스크롤", "NoticeAdapter - setList() - apiResultList : $apiResultList")
+        resultList.addAll(apiResultList)
+    }
+    fun deleteLoading(){
+        Log.d("무한 스크롤", "NoticeAdapter - deleteLoading()")
+        resultList.removeAt(resultList.lastIndex)
+    }
+
 }
