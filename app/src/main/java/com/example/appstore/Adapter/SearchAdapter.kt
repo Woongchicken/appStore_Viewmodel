@@ -1,22 +1,18 @@
 package com.example.appstore.Adapter
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.appstore.DetailActivity
+import com.example.appstore.R
 import com.example.appstore.Retrofit2.ApiResult
-import com.example.appstore.SearchActivity
-import com.example.appstore.Utils
-import com.example.appstore.databinding.ActivitySearchBinding
+import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.ItemSearchBinding
-import java.io.Serializable
 
-class SearchAdapter() :
+class SearchAdapter(private val model: MainViewModel) :
     RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
     private val resultList: MutableList<ApiResult> = mutableListOf()
@@ -54,10 +50,11 @@ class SearchAdapter() :
 
             binding.recyclerView.layoutManager =
                 LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
-            binding.recyclerView.adapter = ScreenShotAdapter(screenShotes, result, true)
+            binding.recyclerView.adapter = ScreenShotAdapter(model, screenShotes, result, true)
 
             binding.comRowid.setOnClickListener {
-                Utils.startDetailActivity(binding.root.context, result)  // 상세 페이지로 이동
+                model.setResult(result)
+                it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
             }
         }
 

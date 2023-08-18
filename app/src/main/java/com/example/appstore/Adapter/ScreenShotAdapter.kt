@@ -1,19 +1,16 @@
 package com.example.appstore.Adapter
 
-import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.appstore.DetailActivity
+import com.example.appstore.R
 import com.example.appstore.Retrofit2.ApiResult
-import com.example.appstore.Utils
+import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.ItemScreenBinding
-import com.example.appstore.databinding.ItemSearchBinding
-import java.io.Serializable
 
-class ScreenShotAdapter(private val screenShotes: List<String>, private val result: ApiResult, private val isClickEventEnabled: Boolean) :
+class ScreenShotAdapter(private val model: MainViewModel, private val screenShotes: List<String>, private val result: ApiResult, private val isClickEventEnabled: Boolean) :
     RecyclerView.Adapter<ScreenShotAdapter.ScreenShotViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScreenShotAdapter.ScreenShotViewHolder {
@@ -40,7 +37,9 @@ class ScreenShotAdapter(private val screenShotes: List<String>, private val resu
             /* 상세페이지 - 스크린샷 클릭 -> 아무 반응 없음.  검색페이지 - 스크린샷 클릭 -> 상세페이지로 이동 */
             if(isClickEventEnabled) {
                 binding.comRowid.setOnClickListener {
-                    Utils.startDetailActivity(binding.root.context, result)  // 상세 페이지로 이동
+                    // ViewModel을 통해 선택한 데이터 전달
+                    model.setResult(result)
+                    it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
                 }
             }
         }

@@ -1,34 +1,23 @@
 package com.example.appstore
 
 import android.R
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
 import android.util.Log
 import android.widget.ArrayAdapter
-import androidx.lifecycle.ViewModelProvider
-import com.example.appstore.Retrofit2.ApiObject
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
-import com.google.android.material.internal.ParcelableSparseArray
+import com.example.appstore.ViewModel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Date
 
 object Utils {
-     var resultList: List<ApiResult>? = null       // 검색 결과 리스트
-
-
     /** 검색어 자동 완성 */
     fun searchTermAuto(context: Context, mainDao: MainDao) : ArrayAdapter<String> {
         val historyEntityList = mainDao.getHistoryAll()
@@ -41,7 +30,7 @@ object Utils {
     fun requestSearch(context: Context, searchTerm: String, mainDao: MainDao, model: MainViewModel)  {
         CoroutineScope(Dispatchers.Main).launch {
             searchApp(searchTerm, mainDao, model)    // api 호출하여 검색 결과 얻음.
-            startSearchActivity(context)          // 검색 결과 페이지로 이동
+            // startSearchActivity(context)          // 검색 결과 페이지로 이동
         }
     }
 
@@ -71,7 +60,7 @@ object Utils {
         Log.d("마지막 검색 목록","Utils - setRecomend(2) [${Thread.currentThread().name}]")
 
         /* 최근 검색어로 검색한 결과, 결과가 없을 경우  */
-        if (resultList.isNullOrEmpty()) {
+        if (model.resultList.value.isNullOrEmpty()) {
             searchTerm = "apple"    // 검색어 'apple'로 설정 후 재 검색
             model.callApi(searchTerm)
             Log.d("마지막 검색 목록","Utils - setRecomend(3) [${Thread.currentThread().name}]")
@@ -80,20 +69,20 @@ object Utils {
 
 
     /** DetailActivity로 이동 (Data1:result-단일 검색 결과) */
-    fun startDetailActivity(context: Context, result : ApiResult){
-        val intent = Intent(context, DetailActivity::class.java)
-//        intent.putExtra("result", result as Serializable)
-        intent.putExtra("result", result as Parcelable)
-        context.startActivity(intent)
-    }
+//    fun startDetailActivity(context: Context, result : ApiResult){
+//        val intent = Intent(context, DetailActivity::class.java)
+////        intent.putExtra("result", result as Serializable)
+//        intent.putExtra("result", result as Parcelable)
+//        context.startActivity(intent)
+//    }
 
     /** SearchActivity로 이동 (Data1:resultList-멀티 검색 결과) */
-    fun startSearchActivity(context: Context) {
-        val intent = Intent(context,SearchActivity::class.java)
-//        intent.putExtra("resultList", resultList as Serializable)
-//        intent.putExtra("resultList", resultList as ArrayList<Parcelable>)
-        context.startActivity(intent)
-    }
+//    fun startSearchActivity(context: Context) {
+//        val intent = Intent(context,SearchActivity::class.java)
+////        intent.putExtra("resultList", resultList as Serializable)
+////        intent.putExtra("resultList", resultList as ArrayList<Parcelable>)
+//        context.startActivity(intent)
+//    }
 
 }
 

@@ -1,22 +1,16 @@
 package com.example.appstore.Adapter
 
-import android.content.Intent
 import android.os.SystemClock
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.example.appstore.DetailActivity
-import com.example.appstore.MainViewModel
-import com.example.appstore.Retrofit2.ApiResult
+import com.example.appstore.R
+import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
-import com.example.appstore.SearchActivity
 import com.example.appstore.Utils
-import com.example.appstore.databinding.ActivityMainBinding
 import com.example.appstore.databinding.ItemHistoryBinding
-import java.io.Serializable
 
 class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private val mainDao: MainDao, private var model : MainViewModel) :
     RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
@@ -50,6 +44,7 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
             binding.comRowid.setOnClickListener {
                 if (SystemClock.elapsedRealtime() - mLastClickTime > 2000) { // 클릭한 시간 차를 계산
                     Utils.requestSearch(binding.root.context, history.searchTerm, mainDao, model) // 검색
+                    it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                 }
                 mLastClickTime = SystemClock.elapsedRealtime()
             }

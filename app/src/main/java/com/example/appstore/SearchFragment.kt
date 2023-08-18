@@ -1,14 +1,13 @@
 package com.example.appstore
 
-import android.content.Intent
-import android.os.Build.VERSION.SDK_INT
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.SystemClock
 import android.util.Log
 import android.view.KeyEvent
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,61 +15,64 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appstore.Adapter.SearchAdapter
 import com.example.appstore.Retrofit2.ApiResult
-import com.example.appstore.Room.MainDao
-import com.example.appstore.Room.RoomDB
-import com.example.appstore.databinding.ActivitySearchBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.appstore.ViewModel.MainViewModel
+import com.example.appstore.databinding.FragmentMainBinding
+import com.example.appstore.databinding.FragmentSearchBinding
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
+    private lateinit var binding : FragmentSearchBinding
 
-    private val binding by lazy {
-        ActivitySearchBinding.inflate(layoutInflater)
-    }
-    private val roomDatabase: RoomDB by lazy {
-        RoomDB.getInstance(this)
-    }
-    private val mainDao: MainDao by lazy {
-        roomDatabase.mainDao()
-    }
     private var mLastClickTime : Long = 0    // Click 키 입력 시간 저장 변수
     private var mLastEnterTime : Long = 0    // Enter 키 입력 시간 저장 변수
 
-    private lateinit var searchAdapter: SearchAdapter
+    private lateinit var searchAdapter : SearchAdapter
+
     lateinit var model: MainViewModel
 
+    private val mainDao by lazy {
+        model.mainDao
+    }
 
-    inline fun <reified T : Parcelable> Intent.parcelableArrayList(key: String): ArrayList<T>? = when {
-        SDK_INT >= 33 -> getParcelableArrayListExtra(key, T::class.java)
-        else -> @Suppress("DEPRECATION") getParcelableArrayListExtra(key)
+    // private lateinit var resultList : List<ApiResult>?
+
+    private val resultList by lazy {
+        model.resultList.value
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         // 뷰 모델 프로바이더를 통해 뷰모델 가져오기
-        // 라이프사이클을 가지고 있는 녀석을 넣어줌. 즉 자기 자신
-        // 우리가 가져오고 싶은 뷰모델 클래스를 넣어서 뷰모델을 가져오기
-        model = ViewModelProvider(this).get(MainViewModel::class.java)
+        model = ViewModelProvider(requireActivity())[MainViewModel::class.java] // requireActivity() - 현재 Fragment가 속한 Activity의 참조를 반환
 
         /** 검색 결과 Adapter 세팅 */
         binding.searchRecyclerView.apply {
-            if (!(model.resultList.value.isNullOrEmpty())) {
+            if (!(resultList.isNullOrEmpty())) {
                 binding.searchRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                // 초기화되지 않은 경우에만 어댑터 초기화
+                if (!::searchAdapter.isInitialized) {
+                    searchAdapter = SearchAdapter(model) // SearchAdapter 초기화
+                }
                 binding.searchRecyclerView.adapter = searchAdapter
             }
         }
 
         // 뷰모델이 가지고 있는 값의 변경사항을 관찰할 수 있는 라이브 데이터를 옵저빙한다
-        model.resultList.observe(this, Observer {
+        model.resultList.observe(viewLifecycleOwner, Observer { // viewLifecycleOwner - 뷰의 생명주기와 연관되어 있어서, Fragment의 뷰가 생성되고 파괴될 때 자동으로 관찰을 시작하고 중단
             Log.d("무한 스크롤", "SearchActivity - mainViewModel - resultList 라이브 데이터 값 변경 : $it")
 
             // 초기화되지 않은 경우에만 어댑터 초기화
             if (!::searchAdapter.isInitialized) {
-                searchAdapter = SearchAdapter() // SearchAdapter 초기화
+                searchAdapter = SearchAdapter(model) // SearchAdapter 초기화
             }
 
             searchAdapter.setList(it)
@@ -93,13 +95,6 @@ class SearchActivity : AppCompatActivity() {
         })
 
 
-
-        // Serializable로 전달된 ApiResult리스트를 Intent에서 받아옴.
-        //val resultList = intent.getSerializableExtra("resultList") as List<ApiResult>
-
-        // Parcelable로 전달된 ApiResult리스트를 Intent에서 받아옴.
-        //val resultList = intent.parcelableArrayList<ApiResult>("resultList") as List<ApiResult>
-
         setInit()   // 초기 셋팅
 
         /* 검색창 클릭할때마다 검색어 자동 완성 매서드 호출 */
@@ -111,7 +106,7 @@ class SearchActivity : AppCompatActivity() {
         binding.searchButton.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) {    // 클릭한 시간 차를 계산
                 val searchTerm = binding.autoCompleteTextView.text.toString()
-                Utils.requestSearch(this, searchTerm, mainDao, model) // 검색
+                Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
             }
             mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
         }
@@ -127,7 +122,7 @@ class SearchActivity : AppCompatActivity() {
                 if (SystemClock.elapsedRealtime() - mLastEnterTime > 5000) {  // Enter 키 입력한 시간 차를 계산
 
                     val searchTerm = binding.autoCompleteTextView.text.toString()
-                    Utils.requestSearch(this, searchTerm, mainDao, model) // 검색
+                    Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
 
                     mLastEnterTime = SystemClock.elapsedRealtime()
                     return@setOnEditorActionListener true
@@ -136,6 +131,8 @@ class SearchActivity : AppCompatActivity() {
             return@setOnEditorActionListener false
         }
 
+
+        return view
     }
 
     /** 초기 세팅 */
@@ -146,27 +143,22 @@ class SearchActivity : AppCompatActivity() {
 
     /** 검색어 자동 완성 Adapter 세팅 */
     private fun searchTermAuto(){
-        val adapter = Utils.searchTermAuto(this, mainDao)
+        val adapter = Utils.searchTermAuto(binding.root.context, mainDao)
         binding.autoCompleteTextView.setAdapter(adapter)
     }
+
     /** 검색 결과에 따라 레이아웃 가시성 설정 */
     private fun setVisibility() {
-        if (model.resultList.value.isNullOrEmpty()) {   // 검색 결과가 없을 경우
-            Log.d("검색 결과 테스트", "setVisibility(1) - ${Utils.resultList}")
+        if (resultList.isNullOrEmpty()) {   // 검색 결과가 없을 경우
+            Log.d("검색 결과 테스트", "setVisibility(1) - ${resultList}")
             binding.saerchResult.visibility = View.VISIBLE
             binding.bottomLinearLayout.visibility = View.GONE
         } else {    // 검색 결과가 있을 경우
-            Log.d("검색 결과 테스트", "setVisibility(2) - ${Utils.resultList}")
+            Log.d("검색 결과 테스트", "setVisibility(2) - ${resultList}")
             binding.saerchResult.visibility = View.GONE
             binding.bottomLinearLayout.visibility = View.VISIBLE
-            //setSearchAdapter()        // 검색 결과 Adapter 세팅
         }
     }
 
-    /** 검색 결과 Adapter 세팅 */
-//    private fun setSearchAdapter(){
-//        binding.searchRecyclerView.layoutManager = LinearLayoutManager(this)
-//        binding.searchRecyclerView.adapter = SearchAdapter(Utils.resultList!!)
-//    }
 
 }
