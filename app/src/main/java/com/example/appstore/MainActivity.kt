@@ -9,13 +9,8 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 /*
 
-8/18 commit (중복클릭 방지)
-
-viewModel 수정 중
-* 할 일
-1. 페이지 로딩 -> Infinite Scroll
-2. 탭 나누기
-3. viewModel, 코루틴 생명주기 맞추기. (검색 결과 불일치)
+8/23 commit (ViewModel)
+1. 탭 구현
 */
 
 class MainActivity : AppCompatActivity() {
@@ -24,14 +19,8 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    lateinit var model: MainViewModel
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        // model = ViewModelProvider(this)[MainViewModel::class.java]
     }
-
 }

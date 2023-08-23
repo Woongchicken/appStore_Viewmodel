@@ -9,7 +9,10 @@ import com.bumptech.glide.Glide
 import com.example.appstore.R
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.ViewModel.MainViewModel
+import com.example.appstore.databinding.ItemProgressBinding
 import com.example.appstore.databinding.ItemRecomendBinding
+import java.text.FieldPosition
+
 
 class RecomendAdapter(private val model: MainViewModel) :
     RecyclerView.Adapter<RecomendAdapter.RecomendViewHolder>() {
@@ -34,8 +37,6 @@ class RecomendAdapter(private val model: MainViewModel) :
     inner class RecomendViewHolder(private val binding: ItemRecomendBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-
-
         fun bind(result: ApiResult) {
             binding.ratingBar.rating = result.averageUserRating ?: 0f                      // 평점
             binding.title.text = result.trackName                                          // 타이틀
@@ -44,26 +45,24 @@ class RecomendAdapter(private val model: MainViewModel) :
                 .load(result.artworkUrl512)
                 .into(binding.img)
 
-
             binding.comRowid.setOnClickListener {
                 // ViewModel을 통해 선택한 데이터 전달
                 model.setResult(result)
                 it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
             }
-
-
-
         }
-
     }
 
-    fun setList(apiResultList: List<ApiResult>) {
-        Log.d("무한 스크롤", "NoticeAdapter - setList() - apiResultList : $apiResultList")
-        resultList.addAll(apiResultList)
+    fun setList(apiResultList: List<ApiResult>, startPosition : Int, endPosition: Int) {
+        val endIndex = Integer.min(endPosition, apiResultList.size)
+        if (startPosition >= 0 && startPosition < endIndex) {
+            val subList = apiResultList.subList(startPosition, endIndex)
+            resultList.addAll(subList)
+        }
     }
-    fun deleteLoading(){
-        Log.d("무한 스크롤", "NoticeAdapter - deleteLoading()")
-        resultList.removeAt(resultList.lastIndex)
+
+    fun setClear(){
+        resultList.clear()
     }
 
 }

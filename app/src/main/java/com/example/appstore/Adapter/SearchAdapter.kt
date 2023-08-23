@@ -61,11 +61,9 @@ class SearchAdapter(private val model: MainViewModel) :
     }
 
     fun setList(apiResultList: List<ApiResult>) {
-        Log.d("무한 스크롤", "NoticeAdapter - setList() - apiResultList : $apiResultList")
         resultList.addAll(apiResultList)
     }
     fun deleteLoading(){
-        Log.d("무한 스크롤", "NoticeAdapter - deleteLoading()")
         resultList.removeAt(resultList.lastIndex)
     }
 }

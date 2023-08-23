@@ -18,6 +18,10 @@ import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.FragmentMainBinding
 import com.example.appstore.databinding.FragmentSearchBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
     private lateinit var binding : FragmentSearchBinding
@@ -39,6 +43,13 @@ class SearchFragment : Fragment() {
         model.resultList.value
     }
 
+    private val requestSearchScope = CoroutineScope(Dispatchers.Main)   // 검색 코루틴스코프
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requestSearchScope.cancel()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -57,6 +68,7 @@ class SearchFragment : Fragment() {
         /** 검색 결과 Adapter 세팅 */
         binding.searchRecyclerView.apply {
             if (!(resultList.isNullOrEmpty())) {
+                Log.d("코루틴 스코프", "SearchFragment - searchRecyclerView / resultList : ${resultList}")
                 binding.searchRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 // 초기화되지 않은 경우에만 어댑터 초기화
                 if (!::searchAdapter.isInitialized) {
@@ -68,7 +80,6 @@ class SearchFragment : Fragment() {
 
         // 뷰모델이 가지고 있는 값의 변경사항을 관찰할 수 있는 라이브 데이터를 옵저빙한다
         model.resultList.observe(viewLifecycleOwner, Observer { // viewLifecycleOwner - 뷰의 생명주기와 연관되어 있어서, Fragment의 뷰가 생성되고 파괴될 때 자동으로 관찰을 시작하고 중단
-            Log.d("무한 스크롤", "SearchActivity - mainViewModel - resultList 라이브 데이터 값 변경 : $it")
 
             // 초기화되지 않은 경우에만 어댑터 초기화
             if (!::searchAdapter.isInitialized) {
@@ -81,7 +92,6 @@ class SearchFragment : Fragment() {
 
         binding.searchRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                Log.d("무한 스크롤", "MainActivity - addOnScrollListener - onScrolled")
                 super.onScrolled(recyclerView, dx, dy)
 
                 val lastVisibleItemPosition =
@@ -105,8 +115,10 @@ class SearchFragment : Fragment() {
         /* 검색 버튼 클릭 이벤트 처리 */
         binding.searchButton.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) {    // 클릭한 시간 차를 계산
-                val searchTerm = binding.autoCompleteTextView.text.toString()
-                Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
+                requestSearchScope.launch {
+                    val searchTerm = binding.autoCompleteTextView.text.toString()
+                    Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
+                }
             }
             mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
         }
@@ -120,11 +132,11 @@ class SearchFragment : Fragment() {
             // 소프트 키보드의 "검색" 버튼이나 하드웨어 키보드의 Enter 키를 눌렀을 때
             if (actionId == EditorInfo.IME_ACTION_SEARCH || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
                 if (SystemClock.elapsedRealtime() - mLastEnterTime > 5000) {  // Enter 키 입력한 시간 차를 계산
-
-                    val searchTerm = binding.autoCompleteTextView.text.toString()
-                    Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
-
-                    mLastEnterTime = SystemClock.elapsedRealtime()
+                    requestSearchScope.launch {
+                        val searchTerm = binding.autoCompleteTextView.text.toString()
+                        Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
+                        mLastEnterTime = SystemClock.elapsedRealtime()
+                    }
                     return@setOnEditorActionListener true
                 }
             }
@@ -149,6 +161,7 @@ class SearchFragment : Fragment() {
 
     /** 검색 결과에 따라 레이아웃 가시성 설정 */
     private fun setVisibility() {
+        Log.d("코루틴 스코프", "SearchFragment - setVisibility / resultList : ${resultList}")
         if (resultList.isNullOrEmpty()) {   // 검색 결과가 없을 경우
             Log.d("검색 결과 테스트", "setVisibility(1) - ${resultList}")
             binding.saerchResult.visibility = View.VISIBLE

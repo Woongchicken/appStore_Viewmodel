@@ -11,8 +11,10 @@ import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
 import com.example.appstore.Utils
 import com.example.appstore.databinding.ItemHistoryBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private val mainDao: MainDao, private var model : MainViewModel) :
+class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private var model : MainViewModel,   private val requestSearchScope: CoroutineScope) :
     RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     private val maxItemCount = 6        // 최대 데이터 표시 갯수
@@ -43,8 +45,10 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
             binding.searchTerm.text = history.searchTerm
             binding.comRowid.setOnClickListener {
                 if (SystemClock.elapsedRealtime() - mLastClickTime > 2000) { // 클릭한 시간 차를 계산
-                    Utils.requestSearch(binding.root.context, history.searchTerm, mainDao, model) // 검색
-                    it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                    requestSearchScope.launch {
+                        Utils.requestSearch(binding.root.context, history.searchTerm, model.mainDao, model) // 검색
+                        it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                    }
                 }
                 mLastClickTime = SystemClock.elapsedRealtime()
             }
