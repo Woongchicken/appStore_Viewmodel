@@ -14,7 +14,6 @@ import com.example.appstore.databinding.ItemSearchBinding
 
 class SearchAdapter(private val model: MainViewModel) :
     RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
-
     private val resultList: MutableList<ApiResult> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
@@ -54,17 +53,23 @@ class SearchAdapter(private val model: MainViewModel) :
 
             binding.comRowid.setOnClickListener {
                 model.setResult(result)
-                it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
+                Log.d("클릭","SearchAdapter / result : ${result}")
+                it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
             }
         }
 
     }
 
-    fun setList(apiResultList: List<ApiResult>) {
-        resultList.addAll(apiResultList)
+    fun setList(apiResultList: List<ApiResult>, startPosition : Int, endPosition: Int) {
+        val endIndex = Integer.min(endPosition, apiResultList.size)
+        if (startPosition >= 0 && startPosition < endIndex) {
+            val subList = apiResultList.subList(startPosition, endIndex)
+            resultList.addAll(subList)
+        }
     }
-    fun deleteLoading(){
-        resultList.removeAt(resultList.lastIndex)
+
+    fun setClear() {
+        resultList.clear()
     }
 }
 

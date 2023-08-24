@@ -38,20 +38,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 class MainFragment : Fragment() {
-
     private lateinit var binding : FragmentMainBinding
-
     private var mLastClickTime : Long = 0    // Click 키 입력 시간 저장 변수
     private var mLastEnterTime : Long = 0    // Enter 키 입력 시간 저장 변수
-
     private var page = 0       // API 호출 결과 페이지
     private var startPosition = 1
     private var endPosition = 1
-
     private lateinit var recomendAdapter : RecomendAdapter
-
     lateinit var model: MainViewModel
-
     private val mainDao by lazy {
         model.mainDao
     }
@@ -59,62 +53,41 @@ class MainFragment : Fragment() {
     private val recomendScope = CoroutineScope(Dispatchers.Main)        // 마지막 검색 목록 코루틴스코프
     private val requestSearchScope = CoroutineScope(Dispatchers.Main)   // 검색 코루틴스코프
 
+    override fun onResume() {
+        super.onResume()
+        setInit()   // 초기 셋팅
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         recomendScope.cancel()
         requestSearchScope.cancel()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         binding = FragmentMainBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        page = 0       // API 호출 결과 페이지
         // 뷰 모델 프로바이더를 통해 뷰모델 가져오기
         model = ViewModelProvider(requireActivity())[MainViewModel::class.java] // requireActivity() - 현재 Fragment가 속한 Activity의 참조를 반환
-
         setInit()
 
-        // 뷰모델이 가지고 있는 값의 변경사항을 관찰할 수 있는 라이브 데이터를 옵저빙
+        // recomendList 라이브 데이터를 옵저빙
         model.recomendList.observe(viewLifecycleOwner, Observer {
-            // 초기화되지 않은 경우에만 어댑터 초기화
-            if (!::recomendAdapter.isInitialized) {
-                recomendAdapter = RecomendAdapter(model)  // RecomendAdapter 초기화
+            if (!::recomendAdapter.isInitialized) {     // !:: 지연 초기화된 프로퍼티의 초기화 상태를 확인, 프로퍼티가 초기화되지 않았을 때 true를 반환
+                recomendAdapter = RecomendAdapter(model)
             }
-
             if(it.size != 0) {
                 recomendAdapter.setList(it, startPosition, endPosition)
                 recomendAdapter.notifyItemRangeInserted(startPosition, endPosition)
             }
         })
 
-        /** 마지막 검색 목록 Adapter 세팅 */
-        binding.recomendRecyclerView.apply {
-            recomendScope.launch {
-                model.clearRecomendList()      // recomendList 초기화
-                recomendAdapter = RecomendAdapter(model)
-                recomendAdapter.setClear()
-
-                Utils.setRecomend(mainDao, model)
-
-                loadMoreData()
-
-                if (!(model.recomendList.value.isNullOrEmpty())) {
-                    binding.recomendRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
-                    // recomendAdapter = RecomendAdapter(model)
-                    binding.recomendRecyclerView.adapter = recomendAdapter
-                }
-            }
-        }
-
-
+        setRecomendAdapter()    // 마지막 검색 목록 Adapter 세팅
 
         //  사용자의 스크롤을 감지하는 리스너
         binding.recomendRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
@@ -173,19 +146,11 @@ class MainFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
-
         return view
-    }
-
-    // 처음 실행, 뒤로가기
-    override fun onResume() {
-        super.onResume()
-        setInit()   // 초기 셋팅
     }
 
     /** 초기 세팅 */
     private fun setInit() {
-        page = 0       // API 호출 결과 페이지
         searchTermAuto()                    // 검색어 자동 완성
         setHistoryAdapter()                 // 최근 검색어
     }
@@ -203,6 +168,24 @@ class MainFragment : Fragment() {
         binding.newLookRecyclerView.layoutManager =
             GridLayoutManager(binding.root.context, 2)     //  spanCount - 그리드의 열 수를 나타내는 정수 값
         binding.newLookRecyclerView.adapter = HistoryAdapter(historyEntityList, model, requestSearchScope)
+    }
+
+    /** 마지막 검색 목록 Adapter 세팅 */
+    private fun setRecomendAdapter(){
+        recomendScope.launch {
+            model.clearRecomendList()      // recomendList 초기화
+            recomendAdapter = RecomendAdapter(model)
+            recomendAdapter.setClear()
+
+            Utils.setRecomend(mainDao, model)
+
+            loadMoreData()
+
+            if (!(model.recomendList.value.isNullOrEmpty())) {
+                binding.recomendRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                binding.recomendRecyclerView.adapter = recomendAdapter
+            }
+        }
     }
 
     /** 마지막 검색 목록 - Data 세팅*/

@@ -46,8 +46,8 @@ class RecomendAdapter(private val model: MainViewModel) :
                 .into(binding.img)
 
             binding.comRowid.setOnClickListener {
-                // ViewModel을 통해 선택한 데이터 전달
                 model.setResult(result)
+                Log.d("클릭","RecomendAdapter / result : ${result}")
                 it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
             }
         }

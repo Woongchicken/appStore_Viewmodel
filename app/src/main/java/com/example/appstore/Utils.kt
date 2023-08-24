@@ -48,25 +48,16 @@ object Utils {
         withContext(Dispatchers.IO) {
             val history: HistoryEntity? = mainDao.getHistoryRecent()
             var searchTerm = history?.searchTerm ?: "apple" // 최근 검색어가 없으면 검색어 'apple'로 설정
-
             val firstApiCall = async { model.callApi(searchTerm) } // 첫 번째 API 호출 비동기 실행
-            // model.callApi(searchTerm)
-
-            Log.d("Test","Utils - setRecomend // resultList(0) : ${model.resultList.value}")
 
             firstApiCall.await()
-
             /* 최근 검색어로 검색한 결과, 결과가 없을 경우  */
             if (model.resultList.value.isNullOrEmpty()) {
-                Log.d("Test","Utils - setRecomend // resultList(1) : ${model.resultList.value}")
                 searchTerm = "apple"    // 검색어 'apple'로 설정 후 재 검색
                 model.callApi(searchTerm)
-                Log.d("Test","Utils - setRecomend // resultList(2) : ${model.resultList.value}")
             }
         }
     }
-
-
 }
 
 

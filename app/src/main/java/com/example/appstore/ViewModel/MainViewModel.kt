@@ -27,20 +27,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // 내부에서 설정하는 자료형은 뮤터블로 변경가능하도록 설정
-    private val _recomendList = MutableLiveData<List<ApiResult>>()
     private val _resultList = MutableLiveData<List<ApiResult>>()
+    private val _recomendList = MutableLiveData<List<ApiResult>>()
+    private val _searchList = MutableLiveData<List<ApiResult>>()
     private val _result = MutableLiveData<ApiResult>()
 
     // 공개적으로 가져오는 변수는 private이 아닌 퍼블릭으로 외부에서도 접근 가능하도록 설정
-    val recomendList: LiveData<List<ApiResult>> = _recomendList
     val resultList: LiveData<List<ApiResult>> = _resultList
+    val recomendList: LiveData<List<ApiResult>> = _recomendList
+    val searchList: LiveData<List<ApiResult>> = _searchList
     val result: LiveData<ApiResult> = _result
 
     fun clearRecomendList() {
         _recomendList.postValue(emptyList())
     }
 
-    /** 결과 값 10개씩 옮기기 (resultList -> recomendList) */
+    fun clearSearchList() {
+        _searchList.postValue(emptyList())
+    }
+
+    /** 마지막 검색 목록 10개씩 옮기기 (resultList -> recomendList) */
     fun moveRecomendList(startPosition: Int, endPosition: Int) {
         val currentResultList = _resultList.value
         if (currentResultList != null) {
@@ -54,15 +60,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
+    /**  검색 목록 10개씩 옮기기 (resultList -> searchList) */
+    fun moveSearchList(startPosition: Int, endPosition: Int) {
+        val currentResultList = _resultList.value
+        if (currentResultList != null) {
+            val endIndex = min(endPosition, currentResultList.size)
+            if (startPosition >= 0 && startPosition < endIndex) {
+                val sublist = currentResultList.subList(startPosition, endIndex)    // 전체 결과 값에서 인덱스에 해당하는 부분만 갖고옴.
+                val currentSearchList = _searchList.value.orEmpty().toMutableList()
+                currentSearchList.addAll(sublist) // recomendList에 인덱스에 해당하는 부분만 추가
+                _searchList.value = currentSearchList
+            }
+        }
+    }
 
     fun setResult(result: ApiResult) {
         _result.value = result
     }
 
     /** API 호출 */
-    suspend fun callApi(searchTerm: String) {
-        withContext(Dispatchers.IO) {
+    fun callApi(searchTerm: String) {
+        // withContext(Dispatchers.IO) {
             val call = ApiObject.getRetrofitService.getApp(searchTerm)
             try {
                 _resultList.postValue(emptyList()) // 초기화
@@ -86,11 +104,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         )
                     }
                     _resultList.postValue(resultList)
+//                    withContext(Dispatchers.Main) {
+//                        _resultList.value = resultList
+//                    }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, e.message.toString())
             }
-        }
+        //}
     }
 
 }

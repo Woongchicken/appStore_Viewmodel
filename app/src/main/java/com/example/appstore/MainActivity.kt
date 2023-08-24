@@ -9,8 +9,13 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 /*
 
-8/23 commit (ViewModel)
-1. 탭 구현
+8/24 commit
+ViewModel 적용 (스크린샷 제외)
+
+ScreenShotAdapter -> ScreenShotAdapter
+DetailFragment -> ScreenShotAdapter
+
+탭 구현
 */
 
 class MainActivity : AppCompatActivity() {
