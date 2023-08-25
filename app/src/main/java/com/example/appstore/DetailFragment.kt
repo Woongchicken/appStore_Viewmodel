@@ -5,15 +5,19 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.appstore.Adapter.ScreenShotAdapter
+import com.example.appstore.Adapter.SearchAdapter
 import com.example.appstore.Adapter.SubInformAdapter
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.ViewModel.MainViewModel
@@ -25,17 +29,11 @@ class DetailFragment : Fragment() {
     private lateinit var binding: FragmentDetailBinding
     lateinit var model: MainViewModel
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDetailBinding.inflate(inflater, container, false)
-        val view = binding.root
 
         model = ViewModelProvider(requireActivity())[MainViewModel::class.java] // requireActivity() - 현재 Fragment가 속한 Activity의 참조를 반환
 
@@ -53,7 +51,7 @@ class DetailFragment : Fragment() {
             toggleAppDescription()     // 전체 내용을 펼치거나 숨기는 작업
         }
 
-        return view
+        return binding.root
     }
 
     override fun onResume() {
@@ -67,7 +65,6 @@ class DetailFragment : Fragment() {
     private fun isViewReady(): Boolean {
         return view?.width ?: 0 > 0 && view?.height ?: 0 > 0
     }
-
 
     /** 초기 세팅 */
     private fun setInit(binding: FragmentDetailBinding, result : ApiResult?) {
@@ -108,10 +105,9 @@ class DetailFragment : Fragment() {
         binding.ratingBar.rating = result.averageUserRating ?: 0f
 
         /*스크린샷*/
-        var searchList = result.screenshotUrls
-
+        var screenShotes = result.screenshotUrls
         binding.screenshotRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
-        binding.screenshotRecyclerView.adapter = ScreenShotAdapter(model, searchList,result,false)
+        binding.screenshotRecyclerView.adapter = ScreenShotAdapter(model, screenShotes, result, true)
 
         /*평가,차트,개발자,언어*/
         binding.subInformationRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
@@ -166,7 +162,4 @@ class DetailFragment : Fragment() {
             binding.showMoreButton.text = "더보기"
         }
     }
-
-
-
 }

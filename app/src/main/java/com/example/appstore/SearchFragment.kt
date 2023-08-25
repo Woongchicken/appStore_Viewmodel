@@ -39,7 +39,6 @@ class SearchFragment : Fragment() {
         model.mainDao
     }
 
-    private val searchScope = CoroutineScope(Dispatchers.Main)   // 검색 결과 코루틴스코프
     private val requestSearchScope = CoroutineScope(Dispatchers.Main)   // 검색 코루틴스코프
 
     override fun onResume() {
@@ -49,7 +48,7 @@ class SearchFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        searchScope.cancel()
+        model.clearTypeList("searchList")      // searchList 초기화
         requestSearchScope.cancel()
     }
 
@@ -58,25 +57,22 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        val view = binding.root
 
         page = 0       // API 호출 결과 페이지
         // 뷰 모델 프로바이더를 통해 뷰모델 가져오기
         model = ViewModelProvider(requireActivity())[MainViewModel::class.java] // requireActivity() - 현재 Fragment가 속한 Activity의 참조를 반환
+
         setInit()
+
+        setSearchAdapter()    // 검색 결과 Adapter 세팅
 
         // searchList 라이브 데이터를 옵저빙
         model.searchList.observe(viewLifecycleOwner, Observer {
-            if (!::searchAdapter.isInitialized) {
-                searchAdapter = SearchAdapter(model)
-            }
-            if(it.size != 0) {
-                searchAdapter.setList(it, startPosition, endPosition)
+            if(it.isNotEmpty()){
+                searchAdapter.setList(it)
                 searchAdapter.notifyItemRangeInserted(startPosition,endPosition)
             }
         })
-
-        setSearchAdapter()    // 검색 결과 Adapter 세팅
 
         //  사용자의 스크롤을 감지하는 리스너
         binding.searchRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
@@ -84,14 +80,11 @@ class SearchFragment : Fragment() {
                 super.onScrolled(recyclerView, dx, dy)
 
                 val lastVisibleItemPosition = (recyclerView.layoutManager as LinearLayoutManager?)!!.findLastCompletelyVisibleItemPosition()
-                Log.d("무한 스크롤", "MainActivity - addOnScrollListener / lastVisibleItemPosition : ${lastVisibleItemPosition}")
                 val itemTotalCount = recyclerView.adapter!!.itemCount-1
-                Log.d("무한 스크롤", "MainActivity - addOnScrollListener / itemTotalCount : ${itemTotalCount}")
 
                 // 스크롤 끝에 도달했는지 체크
                 if (!binding.searchRecyclerView.canScrollVertically(1) && lastVisibleItemPosition == itemTotalCount) { // 1. canScrollVertically - 수직스크롤이 끝에 도달했는지 알려주는 메서드, 최상단에 도달 : -1, 최하단에 도달 : 1 && 2. 데이터의 마지막 아이템이 화면에 뿌려졌는지
-                    // 스크롤이 마지막 아이템에 도달하면 추가 데이터를 로드
-                    loadMoreData()
+                    loadMoreData()    // 스크롤이 마지막 아이템에 도달하면 추가 데이터를 로드
                 }
             }
         })
@@ -106,15 +99,12 @@ class SearchFragment : Fragment() {
             if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) {    // 클릭한 시간 차를 계산
                 requestSearchScope.launch {
                     val searchTerm = binding.autoCompleteTextView.text.toString()
-                    Utils.requestSearch(binding.root.context, searchTerm, mainDao, model)
-
-                    // 현재 SearchFragment 스택 제거 (mainFragment로 되돌아감)
-                    findNavController().popBackStack()
-                    // mainFragment -> searchFragment로 이동
-                    findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                    Utils.requestSearch(binding.root.context, searchTerm, model)
+                    findNavController().popBackStack()                      // 현재 SearchFragment 스택 제거 (mainFragment로 되돌아감)
+                    findNavController().navigate(R.id.action_mainFragment_to_searchFragment)                        // mainFragment -> searchFragment로 이동
+                    mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
                 }
             }
-            mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
         }
 
         /* Enter 키 입력 이벤트 처리 */
@@ -128,11 +118,8 @@ class SearchFragment : Fragment() {
                 if (SystemClock.elapsedRealtime() - mLastEnterTime > 5000) {  // Enter 키 입력한 시간 차를 계산
                     requestSearchScope.launch {
                         val searchTerm = binding.autoCompleteTextView.text.toString()
-                        Utils.requestSearch(binding.root.context, searchTerm, mainDao, model) // 검색
-
-                        // 현재 SearchFragment 스택 제거 (mainFragment로 되돌아감)
+                        Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
                         findNavController().popBackStack()
-                        // mainFragment -> searchFragment로 이동
                         findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                         mLastEnterTime = SystemClock.elapsedRealtime()
                     }
@@ -141,8 +128,7 @@ class SearchFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
-
-        return view
+        return binding.root
     }
 
     /** 초기 세팅 */
@@ -170,30 +156,24 @@ class SearchFragment : Fragment() {
 
     /** 검색 결과 Adapter 세팅 */
     private fun setSearchAdapter(){
-        searchScope.launch {
-            model.clearSearchList()      // searchList 초기화
-            searchAdapter = SearchAdapter(model)
-            searchAdapter.setClear()
+        model.clearTypeList("searchList")      // searchList 초기화
+        searchAdapter = SearchAdapter(model)
+        searchAdapter.setClear()       // RecyclerView List 초기
 
-            loadMoreData()
+        loadMoreData()
 
-            if (!(model.searchList.value.isNullOrEmpty())) {
-                binding.searchRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
-                binding.searchRecyclerView.adapter = searchAdapter
-            }
-        }
+        binding.searchRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+        binding.searchRecyclerView.adapter = searchAdapter
     }
 
-    /** 검색 목록 - Data 세팅*/
+    /** 검색 목록 - 추가 데이터 로드 */
     private fun loadMoreData() {
         ++page
         startPosition = (page - 1) * 10
         endPosition = startPosition + 10
 
-        model.moveSearchList(startPosition,endPosition)     // API 검색 결과(ResultList) ->  검색 목록 결과(SearchList) 10개씩 옮기기
+        model.moveTypeList("searchList",startPosition,endPosition)     // API 검색 결과(ResultList) ->  검색 목록 결과(SearchList) 10개씩 옮기기
     }
-
-
 
 
 }

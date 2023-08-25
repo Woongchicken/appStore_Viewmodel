@@ -47,22 +47,16 @@ class RecomendAdapter(private val model: MainViewModel) :
 
             binding.comRowid.setOnClickListener {
                 model.setResult(result)
-                Log.d("클릭","RecomendAdapter / result : ${result}")
                 it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
             }
         }
     }
 
-    fun setList(apiResultList: List<ApiResult>, startPosition : Int, endPosition: Int) {
-        val endIndex = Integer.min(endPosition, apiResultList.size)
-        if (startPosition >= 0 && startPosition < endIndex) {
-            val subList = apiResultList.subList(startPosition, endIndex)
-            resultList.addAll(subList)
-        }
+    fun setList(apiResultList: List<ApiResult>) {
+        resultList.addAll(apiResultList)
     }
 
     fun setClear(){
         resultList.clear()
     }
-
 }

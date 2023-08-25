@@ -9,13 +9,15 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 /*
 
-8/24 commit
-ViewModel 적용 (스크린샷 제외)
+8/25 commit
+ViewModel & LiveData 적용 (검색 결과만, 스크린샷 X)
 
-ScreenShotAdapter -> ScreenShotAdapter
-DetailFragment -> ScreenShotAdapter
+*할 일
+1. 로그인
+2. 탭 구현
+3. 스크린샷 -> 이미지 처리 (Glide대신 다른 메서드, 데이터 캐싱)
+4. 구조적으로 잘못
 
-탭 구현
 */
 
 class MainActivity : AppCompatActivity() {

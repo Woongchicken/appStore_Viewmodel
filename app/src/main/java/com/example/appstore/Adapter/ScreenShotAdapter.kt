@@ -10,7 +10,7 @@ import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.ItemScreenBinding
 
-class ScreenShotAdapter(private val model: MainViewModel, private val screenShotes: List<String>, private val result: ApiResult, private val isClickEventEnabled: Boolean) :
+class ScreenShotAdapter(private val model: MainViewModel,  private val screenShotes: List<String>, private val result: ApiResult, private val isClickEventEnabled: Boolean) :
     RecyclerView.Adapter<ScreenShotAdapter.ScreenShotViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScreenShotAdapter.ScreenShotViewHolder {
@@ -43,6 +43,5 @@ class ScreenShotAdapter(private val model: MainViewModel, private val screenShot
                 }
             }
         }
-
     }
 }

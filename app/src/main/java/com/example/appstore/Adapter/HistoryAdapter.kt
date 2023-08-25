@@ -46,11 +46,11 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
             binding.comRowid.setOnClickListener {
                 if (SystemClock.elapsedRealtime() - mLastClickTime > 2000) { // 클릭한 시간 차를 계산
                     requestSearchScope.launch {
-                        Utils.requestSearch(binding.root.context, history.searchTerm, model.mainDao, model) // 검색
+                        Utils.requestSearch(binding.root.context, history.searchTerm, model) // 검색
                         it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                        mLastClickTime = SystemClock.elapsedRealtime()
                     }
                 }
-                mLastClickTime = SystemClock.elapsedRealtime()
             }
         }
     }

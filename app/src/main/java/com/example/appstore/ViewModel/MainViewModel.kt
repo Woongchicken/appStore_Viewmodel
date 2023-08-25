@@ -38,38 +38,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val searchList: LiveData<List<ApiResult>> = _searchList
     val result: LiveData<ApiResult> = _result
 
-    fun clearRecomendList() {
-        _recomendList.postValue(emptyList())
-    }
-
-    fun clearSearchList() {
-        _searchList.postValue(emptyList())
-    }
-
-    /** 마지막 검색 목록 10개씩 옮기기 (resultList -> recomendList) */
-    fun moveRecomendList(startPosition: Int, endPosition: Int) {
-        val currentResultList = _resultList.value
-        if (currentResultList != null) {
-            val endIndex = min(endPosition, currentResultList.size)
-            if (startPosition >= 0 && startPosition < endIndex) {
-                val sublist = currentResultList.subList(startPosition, endIndex)    // 전체 결과 값에서 인덱스에 해당하는 부분만 갖고옴.
-                val currentRecomendList = _recomendList.value.orEmpty().toMutableList()
-                currentRecomendList.addAll(sublist) // recomendList에 인덱스에 해당하는 부분만 추가
-                _recomendList.value = currentRecomendList
-            }
+    fun clearTypeList(typeList: String) {
+        when(typeList) {
+            "searchList" -> _searchList.value = emptyList()
+            else -> _recomendList.value = emptyList()
         }
     }
 
-    /**  검색 목록 10개씩 옮기기 (resultList -> searchList) */
-    fun moveSearchList(startPosition: Int, endPosition: Int) {
+    /**  목록 10개씩 옮기기 (resultList -> typeList) */
+    fun moveTypeList(typeList: String, startPosition: Int, endPosition: Int) {
         val currentResultList = _resultList.value
         if (currentResultList != null) {
             val endIndex = min(endPosition, currentResultList.size)
             if (startPosition >= 0 && startPosition < endIndex) {
                 val sublist = currentResultList.subList(startPosition, endIndex)    // 전체 결과 값에서 인덱스에 해당하는 부분만 갖고옴.
-                val currentSearchList = _searchList.value.orEmpty().toMutableList()
-                currentSearchList.addAll(sublist) // recomendList에 인덱스에 해당하는 부분만 추가
-                _searchList.value = currentSearchList
+                when(typeList) {
+                    "searchList" -> _searchList.value = sublist
+                    else -> _recomendList.value = sublist
+                }
             }
         }
     }
@@ -80,40 +66,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /** API 호출 */
     fun callApi(searchTerm: String) {
-        // withContext(Dispatchers.IO) {
-            val call = ApiObject.getRetrofitService.getApp(searchTerm)
-            try {
-                _resultList.postValue(emptyList()) // 초기화
-                val response = call.execute()
-                val results = response.body()?.results
-
-                if (results.isNullOrEmpty()) {
-                } else {
-                    val resultList = results.map { result ->
-                        ApiResult(
-                            artworkUrl512 = result.artworkUrl512 ?: " ",
-                            trackName = result.trackName ?: " ",
-                            averageUserRating = result.averageUserRating ?: 0f,
-                            screenshotUrls = result.screenshotUrls,
-                            description = result.description ?: " ",
-                            trackContentRating = result.trackContentRating ?: " ",
-                            artistName = result.artistName ?: " ",
-                            userRatingCount = result.userRatingCount ?: " ",
-                            primaryGenreName = result.primaryGenreName ?: " ",
-                            releaseNotes = result.releaseNotes ?: " "
-                        )
-                    }
-                    _resultList.postValue(resultList)
-//                    withContext(Dispatchers.Main) {
-//                        _resultList.value = resultList
-//                    }
+        val call = ApiObject.getRetrofitService.getApp(searchTerm)
+        try {
+            val response = call.execute()
+            val results = response.body()?.results
+            if (results.isNullOrEmpty()) {
+            } else {
+                val resultList = results.map { result ->
+                    ApiResult(
+                        artworkUrl512 = result.artworkUrl512 ?: " ",
+                        trackName = result.trackName ?: " ",
+                        averageUserRating = result.averageUserRating ?: 0f,
+                        screenshotUrls = result.screenshotUrls,
+                        description = result.description ?: " ",
+                        trackContentRating = result.trackContentRating ?: " ",
+                        artistName = result.artistName ?: " ",
+                        userRatingCount = result.userRatingCount ?: " ",
+                        primaryGenreName = result.primaryGenreName ?: " ",
+                        releaseNotes = result.releaseNotes ?: " "
+                    )
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, e.message.toString())
+                _resultList.postValue(resultList)
             }
-        //}
+        } catch (e: Exception) {
+            Log.e(TAG, e.message.toString())
+        }
     }
-
 }
 
 

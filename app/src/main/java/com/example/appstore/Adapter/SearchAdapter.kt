@@ -3,6 +3,8 @@ package com.example.appstore.Adapter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.appstore.R
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.ViewModel.MainViewModel
+import com.example.appstore.databinding.FragmentDetailBinding
 import com.example.appstore.databinding.ItemSearchBinding
 
 class SearchAdapter(private val model: MainViewModel) :
@@ -35,7 +38,6 @@ class SearchAdapter(private val model: MainViewModel) :
 
     inner class SearchViewHolder(private val binding: ItemSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         fun bind(result: ApiResult) {
             binding.ratingBar.rating = result.averageUserRating ?: 0f                      // 평점
             binding.title.text = result.trackName                                          // 타이틀
@@ -46,26 +48,18 @@ class SearchAdapter(private val model: MainViewModel) :
 
             /*스크린샷*/
             var screenShotes = result.screenshotUrls
-
-            binding.recyclerView.layoutManager =
-                LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerView.adapter = ScreenShotAdapter(model, screenShotes, result, true)
 
             binding.comRowid.setOnClickListener {
                 model.setResult(result)
-                Log.d("클릭","SearchAdapter / result : ${result}")
                 it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
             }
         }
-
     }
 
-    fun setList(apiResultList: List<ApiResult>, startPosition : Int, endPosition: Int) {
-        val endIndex = Integer.min(endPosition, apiResultList.size)
-        if (startPosition >= 0 && startPosition < endIndex) {
-            val subList = apiResultList.subList(startPosition, endIndex)
-            resultList.addAll(subList)
-        }
+    fun setList(apiResultList: List<ApiResult>) {
+        resultList.addAll(apiResultList)
     }
 
     fun setClear() {
