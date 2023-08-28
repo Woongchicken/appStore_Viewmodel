@@ -55,7 +55,6 @@ object Utils {
 
             /* 최근 검색어로 검색한 결과, 결과가 없을 경우  */
             if (model.resultList.value.isNullOrEmpty()) {
-                Log.d("Test", "Utils - setRecomend(2) // resultList : ${model.resultList.value}")
                 searchTerm = "apple"    // 검색어 'apple'로 설정 후 재 검색
                 model.callApi(searchTerm)
             }

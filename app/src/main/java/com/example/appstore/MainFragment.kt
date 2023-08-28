@@ -42,6 +42,7 @@ class MainFragment : Fragment() {
 
     private val recomendScope = CoroutineScope(Dispatchers.Main)        // 마지막 검색 목록 코루틴스코프
     private val requestSearchScope = CoroutineScope(Dispatchers.Main)   // 검색 코루틴스코프
+    private val historyAdapterScope = CoroutineScope(Dispatchers.Main)  // 히스토리 어댑터에 넘겨줄 코루틴 스코프
 
     override fun onResume() {
         super.onResume()
@@ -103,6 +104,7 @@ class MainFragment : Fragment() {
                 requestSearchScope.launch {
                     val searchTerm = binding.autoCompleteTextView.text.toString()
                     Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
+                    Log.d("내비게이션", "MainFragment(1) : mainFragment-> searchFragment")
                     it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                     mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
                 }
@@ -121,6 +123,7 @@ class MainFragment : Fragment() {
                     requestSearchScope.launch {
                         val searchTerm = binding.autoCompleteTextView.text.toString()
                         Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
+                        Log.d("내비게이션", "MainFragment(2) : mainFragment-> searchFragment")
                         findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                         mLastEnterTime = SystemClock.elapsedRealtime()
                     }
@@ -150,7 +153,8 @@ class MainFragment : Fragment() {
 
         binding.newLookRecyclerView.layoutManager =
             GridLayoutManager(binding.root.context, 2)     //  spanCount - 그리드의 열 수를 나타내는 정수 값
-        binding.newLookRecyclerView.adapter = HistoryAdapter(historyEntityList, model, requestSearchScope)
+        val isClicked = true
+        binding.newLookRecyclerView.adapter = HistoryAdapter(historyEntityList, model, historyAdapterScope)
     }
 
     /** 마지막 검색 목록 Adapter 세팅 */
@@ -164,6 +168,7 @@ class MainFragment : Fragment() {
 
             loadMoreData()      // 인덱스 증가
 
+            binding.recomendRecyclerView.itemAnimator = null    //  애니메이션 효과 제거
             binding.recomendRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
             binding.recomendRecyclerView.adapter = recomendAdapter
         }

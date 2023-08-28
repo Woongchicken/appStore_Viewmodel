@@ -107,7 +107,7 @@ class DetailFragment : Fragment() {
         /*스크린샷*/
         var screenShotes = result.screenshotUrls
         binding.screenshotRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
-        binding.screenshotRecyclerView.adapter = ScreenShotAdapter(model, screenShotes, result, true)
+        binding.screenshotRecyclerView.adapter = ScreenShotAdapter(model, screenShotes, result, false)
 
         /*평가,차트,개발자,언어*/
         binding.subInformationRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)

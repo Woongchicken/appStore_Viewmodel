@@ -9,8 +9,10 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 /*
 
-8/25 commit
+8/28 commit
 ViewModel & LiveData 적용 (검색 결과만, 스크린샷 X)
+call API - postValue -> setValue
+HistoryAdapter - 중복 방지 변수 적용
 
 *할 일
 1. 로그인

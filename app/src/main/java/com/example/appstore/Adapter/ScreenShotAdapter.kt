@@ -1,5 +1,6 @@
 package com.example.appstore.Adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.findNavController
@@ -39,6 +40,7 @@ class ScreenShotAdapter(private val model: MainViewModel,  private val screenSho
                 binding.comRowid.setOnClickListener {
                     // ViewModel을 통해 선택한 데이터 전달
                     model.setResult(result)
+                    Log.d("내비게이션", "ScreenShotAdapter : searchFragment-> detailFragment")
                     it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
                 }
             }

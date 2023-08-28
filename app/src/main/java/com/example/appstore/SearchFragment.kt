@@ -100,7 +100,8 @@ class SearchFragment : Fragment() {
                 requestSearchScope.launch {
                     val searchTerm = binding.autoCompleteTextView.text.toString()
                     Utils.requestSearch(binding.root.context, searchTerm, model)
-                    findNavController().popBackStack()                      // 현재 SearchFragment 스택 제거 (mainFragment로 되돌아감)
+                    findNavController().popBackStack()  // 현재 SearchFragment 스택 제거 (mainFragment로 되돌아감)
+                    Log.d("내비게이션", "SearchFragment(1) : mainFragment-> searchFragment")
                     findNavController().navigate(R.id.action_mainFragment_to_searchFragment)                        // mainFragment -> searchFragment로 이동
                     mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
                 }
@@ -120,6 +121,7 @@ class SearchFragment : Fragment() {
                         val searchTerm = binding.autoCompleteTextView.text.toString()
                         Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
                         findNavController().popBackStack()
+                        Log.d("내비게이션", "SearchFragment(2) : mainFragment-> searchFragment")
                         findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                         mLastEnterTime = SystemClock.elapsedRealtime()
                     }
@@ -162,6 +164,7 @@ class SearchFragment : Fragment() {
 
         loadMoreData()
 
+        binding.searchRecyclerView.itemAnimator = null    //  애니메이션 효과 제거
         binding.searchRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
         binding.searchRecyclerView.adapter = searchAdapter
     }

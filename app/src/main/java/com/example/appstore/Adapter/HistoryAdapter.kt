@@ -1,6 +1,7 @@
 package com.example.appstore.Adapter
 
 import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.findNavController
@@ -19,6 +20,7 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
 
     private val maxItemCount = 6        // 최대 데이터 표시 갯수
     private var mLastClickTime : Long = 0    // Click 키 입력 시간 저장 변수
+    private var isClicked = false
 
 
     /* 뷰 홀더 생성 (호출되는 횟수가 정해져있음) */
@@ -43,8 +45,9 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
         RecyclerView.ViewHolder(binding.root) {
         fun bind(history: HistoryEntity) {
             binding.searchTerm.text = history.searchTerm
-            binding.comRowid.setOnClickListener {
-                if (SystemClock.elapsedRealtime() - mLastClickTime > 2000) { // 클릭한 시간 차를 계산
+            binding.comRowid.setOnClickListener { // 클릭한 시간 차를 계산
+                if ( !isClicked ) {         // 중복 클릭 방지 변수
+                    isClicked = true
                     requestSearchScope.launch {
                         Utils.requestSearch(binding.root.context, history.searchTerm, model) // 검색
                         it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)

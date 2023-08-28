@@ -47,6 +47,7 @@ class RecomendAdapter(private val model: MainViewModel) :
 
             binding.comRowid.setOnClickListener {
                 model.setResult(result)
+                Log.d("내비게이션", "RecomendAdapter : mainFragment-> detailFragment")
                 it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
             }
         }

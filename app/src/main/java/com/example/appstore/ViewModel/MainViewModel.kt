@@ -65,7 +65,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /** API 호출 */
-    fun callApi(searchTerm: String) {
+    suspend fun callApi(searchTerm: String) {
         val call = ApiObject.getRetrofitService.getApp(searchTerm)
         try {
             val response = call.execute()
@@ -86,7 +86,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         releaseNotes = result.releaseNotes ?: " "
                     )
                 }
-                _resultList.postValue(resultList)
+                withContext(Dispatchers.Main) {
+                    _resultList.value = resultList
+                }
+                // _resultList.postValue(resultList)
             }
         } catch (e: Exception) {
             Log.e(TAG, e.message.toString())
