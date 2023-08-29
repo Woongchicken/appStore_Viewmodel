@@ -2,20 +2,15 @@ package com.example.appstore
 
 import android.R
 import android.content.Context
-import android.content.Intent
-import android.os.Parcelable
-import android.util.Log
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
 import com.example.appstore.ViewModel.MainViewModel
-import kotlinx.coroutines.CoroutineScope
+import com.example.appstore.main.LoadingFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date

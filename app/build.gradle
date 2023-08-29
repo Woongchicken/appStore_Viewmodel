@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    // id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 apply plugin: 'kotlin-kapt'
@@ -41,6 +43,7 @@ android {
 }
 
 dependencies {
+    // implementation 'com.google.firebase:firebase-common-ktx:20.3.3'
     def nav_version = "2.5.3"
 
     implementation 'androidx.core:core-ktx:1.8.0'
@@ -87,6 +90,19 @@ dependencies {
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-database-ktx")
+
+
+
+
+//    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+//    implementation("com.google.firebase:firebase-auth-ktx")
+
 
 
 }

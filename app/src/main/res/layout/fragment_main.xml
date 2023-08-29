@@ -7,7 +7,7 @@
     android:background="@color/white"
     android:orientation="vertical"
     android:padding="5dp"
-    tools:context=".MainActivity">
+    tools:context=".main.MainActivity">
 
     <LinearLayout
         android:id="@+id/topLinearLayout"
@@ -25,6 +25,7 @@
             android:textSize="30sp"
             android:layout_weight="3"/>
         <ImageView
+            android:id="@+id/user_icon"
             android:src="@drawable/user_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"

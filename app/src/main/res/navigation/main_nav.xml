@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.appstore.DetailFragment"
+        android:name="com.example.appstore.main.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" >
         <action
@@ -23,7 +23,7 @@
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.appstore.MainFragment"
+        android:name="com.example.appstore.main.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.appstore.SearchFragment"
+        android:name="com.example.appstore.main.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" >
         <action
@@ -54,7 +54,7 @@
 
     <fragment
         android:id="@+id/loadingFragment"
-        android:name="com.example.appstore.LoadingFragment"
+        android:name="com.example.appstore.main.LoadingFragment"
         android:label="fragment_loading"
         tools:layout="@layout/fragment_loading" >
     </fragment>
