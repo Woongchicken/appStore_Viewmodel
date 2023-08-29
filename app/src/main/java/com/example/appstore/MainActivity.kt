@@ -9,16 +9,15 @@ import com.example.appstore.databinding.ActivityMainBinding
 
 /*
 
-8/28 commit
-ViewModel & LiveData 적용 (검색 결과만, 스크린샷 X)
-call API - postValue -> setValue
-HistoryAdapter - 중복 방지 변수 적용
+8/29 commit
+1. ViewModel & LiveData 적용 (검색 결과만, 스크린샷 X)
+2. call API - postValue -> setValue
+3. HistoryAdapter - 중복 방지 변수 적용
+4. Glide 이미지 캐싱 (아이콘, 스크린샷)
 
 *할 일
 1. 로그인
 2. 탭 구현
-3. 스크린샷 -> 이미지 처리 (Glide대신 다른 메서드, 데이터 캐싱)
-4. 구조적으로 잘못
 
 */
 

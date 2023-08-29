@@ -71,6 +71,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val response = call.execute()
             val results = response.body()?.results
             if (results.isNullOrEmpty()) {
+                withContext(Dispatchers.Main) {
+                    _resultList.value = emptyList()     // 검색 결과 없을 경우 - 빈 값으로 초기화
+                }
             } else {
                 val resultList = results.map { result ->
                     ApiResult(

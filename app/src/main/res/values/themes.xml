@@ -8,6 +8,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="LoadingDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
     <color name="appstore_primary">#3F51B5</color>
     <color name="appstore_primary_dark">#303F9F</color>
     <color name="appstore_accent">#FF4081</color>

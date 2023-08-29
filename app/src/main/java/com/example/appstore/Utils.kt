@@ -6,6 +6,8 @@ import android.content.Intent
 import android.os.Parcelable
 import android.util.Log
 import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.Room.HistoryEntity
 import com.example.appstore.Room.MainDao
@@ -19,6 +21,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 object Utils {
+    private var loadingFragment: LoadingFragment? = null
+
     /** 검색어 자동 완성 */
     fun searchTermAuto(context: Context, mainDao: MainDao) : ArrayAdapter<String> {
         val historyEntityList = mainDao.getHistoryAll()
@@ -61,6 +65,27 @@ object Utils {
         }
     }
 
+
+    /** 로딩화면 표시 */
+    fun showLoadingFragment(fragment : Fragment) {
+        if (loadingFragment == null) {
+            loadingFragment = LoadingFragment()
+            loadingFragment?.isCancelable = false // 로딩 중에는 취소할 수 없도록 설정
+        }
+        loadingFragment?.show(fragment.parentFragmentManager, "loading")
+    }
+
+    /** 로딩화면 숨김 */
+    fun hideLoadingFragment() {
+        loadingFragment?.dismiss()      //  프래그먼트를 닫고 메모리에서 제거
+        loadingFragment = null
+    }
+
+    /** Glide - 이미지 캐싱 */
+    fun preload(context: Context, url : String) {
+        Glide.with(context).load(url)
+            .preload(500, 500)  // 지정된 크기로 조정하여 캐싱
+    }
 
 }
 

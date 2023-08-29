@@ -100,13 +100,15 @@ class MainFragment : Fragment() {
 
         /* 검색 버튼 클릭 이벤트 처리 */
         binding.searchButton.setOnClickListener {
-            if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) {    // 클릭한 시간 차를 계산
+            if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) { // 클릭한 시간 차를 계산
+                val currentFragment = this
                 requestSearchScope.launch {
+                    Utils.showLoadingFragment(currentFragment)     // 로딩 화면 표시
                     val searchTerm = binding.autoCompleteTextView.text.toString()
                     Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
-                    Log.d("내비게이션", "MainFragment(1) : mainFragment-> searchFragment")
                     it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                     mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
+                    Utils.hideLoadingFragment()     // 작업이 완료되면 로딩 화면 숨김
                 }
             }
         }
@@ -120,12 +122,14 @@ class MainFragment : Fragment() {
             // 소프트 키보드의 "검색" 버튼이나 하드웨어 키보드의 Enter 키를 눌렀을 때
             if (actionId == EditorInfo.IME_ACTION_SEARCH || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
                 if (SystemClock.elapsedRealtime() - mLastEnterTime > 5000) {  // Enter 키 입력한 시간 차를 계산
+                    val currentFragment = this
                     requestSearchScope.launch {
+                        Utils.showLoadingFragment(currentFragment)     // 로딩 화면 표시
                         val searchTerm = binding.autoCompleteTextView.text.toString()
                         Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
-                        Log.d("내비게이션", "MainFragment(2) : mainFragment-> searchFragment")
                         findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                         mLastEnterTime = SystemClock.elapsedRealtime()
+                        Utils.hideLoadingFragment()     // 작업이 완료되면 로딩 화면 숨김
                     }
                     return@setOnEditorActionListener true
                 }
@@ -150,11 +154,9 @@ class MainFragment : Fragment() {
     /** 최근 검색어  Adapter 세팅 */
     private fun setHistoryAdapter(){
         val historyEntityList = mainDao.getHistoryAll()
-
         binding.newLookRecyclerView.layoutManager =
             GridLayoutManager(binding.root.context, 2)     //  spanCount - 그리드의 열 수를 나타내는 정수 값
-        val isClicked = true
-        binding.newLookRecyclerView.adapter = HistoryAdapter(historyEntityList, model, historyAdapterScope)
+        binding.newLookRecyclerView.adapter = HistoryAdapter(historyEntityList, model, historyAdapterScope, this)
     }
 
     /** 마지막 검색 목록 Adapter 세팅 */

@@ -4,6 +4,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appstore.R
@@ -15,7 +16,7 @@ import com.example.appstore.databinding.ItemHistoryBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private var model : MainViewModel,   private val requestSearchScope: CoroutineScope) :
+class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private var model : MainViewModel,   private val requestSearchScope: CoroutineScope, private val fragment : Fragment) :
     RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     private val maxItemCount = 6        // 최대 데이터 표시 갯수
@@ -47,11 +48,13 @@ class HistoryAdapter(private val historyEntityList: List<HistoryEntity>, private
             binding.searchTerm.text = history.searchTerm
             binding.comRowid.setOnClickListener { // 클릭한 시간 차를 계산
                 if ( !isClicked ) {         // 중복 클릭 방지 변수
-                    isClicked = true
                     requestSearchScope.launch {
+                        isClicked = true
+                        Utils.showLoadingFragment(fragment)     // 로딩 화면 표시
                         Utils.requestSearch(binding.root.context, history.searchTerm, model) // 검색
                         it.findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
                         mLastClickTime = SystemClock.elapsedRealtime()
+                        Utils.hideLoadingFragment()     // 작업이 완료되면 로딩 화면 숨김
                     }
                 }
             }
