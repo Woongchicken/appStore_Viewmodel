@@ -38,6 +38,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val searchList: LiveData<List<ApiResult>> = _searchList
     val result: LiveData<ApiResult> = _result
 
+    // lieveData의 특정 List 초기화
     fun clearTypeList(typeList: String) {
         when(typeList) {
             "searchList" -> _searchList.value = emptyList()
@@ -92,7 +93,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     _resultList.value = resultList
                 }
-                // _resultList.postValue(resultList)
             }
         } catch (e: Exception) {
             Log.e(TAG, e.message.toString())

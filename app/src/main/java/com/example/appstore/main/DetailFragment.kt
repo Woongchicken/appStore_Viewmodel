@@ -1,10 +1,12 @@
 package com.example.appstore.main
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -45,23 +47,20 @@ class DetailFragment : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (isViewReady()) {
-            setNewFunctionButton()
-            setDescription()
-        }
-    }
-
-    private fun isViewReady(): Boolean {
-        return view?.width ?: 0 > 0 && view?.height ?: 0 > 0
-    }
-
     /** 초기 세팅 */
     private fun setInit(binding: FragmentDetailBinding, result : ApiResult?) {
         if (result != null ){        // 검색 결과가 있을 경우
             bindData(binding, result)      // 검색 결과 바인딩
         }
+
+        // View가 준비되었을 때 실행
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {        // ViewTreeObserver 리스너 등록
+            override fun onGlobalLayout() {
+                setNewFunctionButton()
+                setDescription()
+                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)                // ViewTreeObserver 리스너 해제
+            }
+        })
     }
 
     /** 검색 결과 바인딩 */
@@ -107,7 +106,7 @@ class DetailFragment : Fragment() {
 
     /* 앱 버전 - '더보기' 버튼 표시 */
     private fun setNewFunctionButton(){
-        val lines = binding.newFunction.lineCount       // TextView에 텍스트가 렌더링된 후에만 정확한 값을 가지기 때문에 onCreate() 메서드에서 호출하면 정확한 줄 수를 얻을 수 없음..
+        val lines = binding.newFunction.lineCount       // lineCount - TextView에 텍스트가 렌더링된 후에만 정확한 값을 가지기 때문에 onCreate() 메서드에서 호출하면 정확한 줄 수를 얻을 수 없음..
         if (lines > 1){
             binding.showMoreButtonFunction.visibility = View.VISIBLE
         }else {

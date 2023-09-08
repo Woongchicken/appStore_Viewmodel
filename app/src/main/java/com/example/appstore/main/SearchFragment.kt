@@ -2,6 +2,7 @@ package com.example.appstore.main
 
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -36,18 +37,7 @@ class SearchFragment : Fragment() {
         model.mainDao
     }
 
-    private val requestSearchScope = CoroutineScope(Dispatchers.Main)   // 검색 코루틴스코프
-
-    override fun onResume() {
-        super.onResume()
-        setInit()   // 초기 셋팅
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        model.clearTypeList("searchList")      // searchList 초기화
-        requestSearchScope.cancel()
-    }
+    private val searchScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,12 +84,14 @@ class SearchFragment : Fragment() {
         /* 검색 버튼 클릭 이벤트 처리 */
         binding.searchButton.setOnClickListener {
             if (SystemClock.elapsedRealtime() - mLastClickTime > 5000) {    // 클릭한 시간 차를 계산
-                requestSearchScope.launch {
+                val currentFragment = this
+                searchScope.launch {
+                    Utils.showLoadingFragment(currentFragment)     // 로딩 화면 표시
                     val searchTerm = binding.autoCompleteTextView.text.toString()
-                    Utils.requestSearch(binding.root.context, searchTerm, model)
-                    findNavController().popBackStack()  // 현재 SearchFragment 스택 제거 (mainFragment로 되돌아감)
-                    findNavController().navigate(R.id.action_mainFragment_to_searchFragment)                        // mainFragment -> searchFragment로 이동
+                    Utils.requestSearch(searchTerm, model)      // 검색
+                    findNavController().navigate(R.id.action_searchFragment_self)            // searchFragment로 -> searchFragment로 이동
                     mLastClickTime = SystemClock.elapsedRealtime()  // elapsedRealtime() - 안드로이드 시스템 시간을 나타내는 함수, 시스템 부팅 이후로 경과한 시간(밀리초)을 반환
+                    Utils.hideLoadingFragment()     // 작업이 완료되면 로딩 화면 숨김
                 }
             }
         }
@@ -113,12 +105,14 @@ class SearchFragment : Fragment() {
             // 소프트 키보드의 "검색" 버튼이나 하드웨어 키보드의 Enter 키를 눌렀을 때
             if (actionId == EditorInfo.IME_ACTION_SEARCH || (event != null && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
                 if (SystemClock.elapsedRealtime() - mLastEnterTime > 5000) {  // Enter 키 입력한 시간 차를 계산
-                    requestSearchScope.launch {
+                    val currentFragment = this
+                    searchScope.launch {
+                        Utils.showLoadingFragment(currentFragment)     // 로딩 화면 표시
                         val searchTerm = binding.autoCompleteTextView.text.toString()
-                        Utils.requestSearch(binding.root.context, searchTerm, model) // 검색
-                        findNavController().popBackStack()
-                        findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                        Utils.requestSearch(searchTerm, model) // 검색
+                        findNavController().navigate(R.id.action_searchFragment_self)            // searchFragment로 -> searchFragment로 이동
                         mLastEnterTime = SystemClock.elapsedRealtime()
+                        Utils.hideLoadingFragment()     // 작업이 완료되면 로딩 화면 숨김
                     }
                     return@setOnEditorActionListener true
                 }
@@ -136,7 +130,7 @@ class SearchFragment : Fragment() {
 
     /** 검색어 자동 완성 Adapter 세팅 */
     private fun searchTermAuto(){
-        val adapter = Utils.searchTermAuto(binding.root.context, mainDao)
+        val adapter = Utils.searchTermAuto(binding.root.context)
         binding.autoCompleteTextView.setAdapter(adapter)
     }
 
@@ -172,6 +166,5 @@ class SearchFragment : Fragment() {
 
         model.moveTypeList("searchList",startPosition,endPosition)     // API 검색 결과(ResultList) ->  검색 목록 결과(SearchList) 10개씩 옮기기
     }
-
 
 }

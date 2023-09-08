@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.appstore.R
 import com.example.appstore.databinding.FragmentSplashBinding
 import com.example.appstore.main.MainActivity
+import com.example.appstore.main.MainFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -19,11 +20,6 @@ class SplashFragment : Fragment() {
 
     private lateinit var binding : FragmentSplashBinding
     private lateinit var auth: FirebaseAuth
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,12 +33,12 @@ class SplashFragment : Fragment() {
             // 회원가입이 안되어있으면 -> JoinFragment
             Handler().postDelayed({
                 findNavController().navigate(R.id.action_splashFragment_to_joinFragment)
-            },2000)
+            },500)
         } else {
-            // 회원가입이 되어있으면 -> MainActivity
+            // 회원가입이 되어있으면 -> MainFragment
             Handler().postDelayed({
-                startActivity(Intent(requireContext(), MainActivity::class.java))
-            },2000)
+                findNavController().navigate(R.id.action_splashFragment_to_mainFragment)
+            },500)
         }
 
         return binding.root

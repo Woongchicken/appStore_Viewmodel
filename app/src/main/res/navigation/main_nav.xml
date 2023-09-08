@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/splashFragment">
 
     <fragment
         android:id="@+id/detailFragment"
@@ -35,6 +35,9 @@
         <argument
             android:name="result"
             app:argType="com.example.appstore.Retrofit2.ApiResult" />
+        <action
+            android:id="@+id/action_mainFragment_to_joinFragment"
+            app:destination="@id/joinFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -49,7 +52,9 @@
             app:destination="@id/detailFragment" />
         <action
             android:id="@+id/action_searchFragment_self"
-            app:destination="@id/searchFragment" />
+            app:destination="@id/searchFragment"
+            app:popUpTo="@id/searchFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment
@@ -57,6 +62,29 @@
         android:name="com.example.appstore.main.LoadingFragment"
         android:label="fragment_loading"
         tools:layout="@layout/fragment_loading" >
+    </fragment>
+    <fragment
+        android:id="@+id/joinFragment"
+        android:name="com.example.appstore.Login.JoinFragment"
+        android:label="JoinFragment" >
+        <action
+            android:id="@+id/action_joinFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.appstore.Login.SplashFragment"
+        android:label="SplashFragment" >
+        <action
+            android:id="@+id/action_splashFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_joinFragment"
+            app:destination="@id/joinFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 
