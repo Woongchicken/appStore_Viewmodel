@@ -18,6 +18,7 @@ import com.example.appstore.Utils
 import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.FragmentDetailBinding
 import com.example.appstore.databinding.ItemSearchBinding
+import com.example.appstore.main.SearchFragmentDirections
 
 class SearchAdapter(private val model: MainViewModel) :
     RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
@@ -75,8 +76,11 @@ class SearchAdapter(private val model: MainViewModel) :
             binding.recyclerView.adapter = ScreenShotAdapter(model, screenShotes, result, true)
 
             binding.comRowid.setOnClickListener {
-                model.setResult(result)
-                it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
+                // model.setResult(result)      // ViewModel을 통해 선택한 데이터 전달
+                // it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
+
+                val action = SearchFragmentDirections.actionSearchFragmentToDetailFragment(result)      // Navagation Safe Args
+                it.findNavController().navigate(action)
             }
         }
     }

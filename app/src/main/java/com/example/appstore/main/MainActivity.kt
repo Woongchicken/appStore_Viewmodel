@@ -11,7 +11,7 @@ import com.example.appstore.databinding.FragmentMainBinding
 
 /*
 
-9/08 commit
+9/11 commit
 1. ViewModel & LiveData 적용 (검색 결과만, 스크린샷 X)
 2. call API - postValue -> setValue
 3. HistoryAdapter - 중복 방지 변수 적용
@@ -19,12 +19,10 @@ import com.example.appstore.databinding.FragmentMainBinding
 5. 로그인 & 회원가입
 6. 회원별 History 저장, 불러오기 (FireBase-RealDataBase) // RoomDB 사용 X
 7. Button Visible -> viewTreeObserver로 변경
-
+8. 탭 구현 (Layout-DataBinding)
 
 *할 일
-1. 탭 구현
-2. 백버튼 (뒤로가기)
-3. 회원 가입 필드추가 및 예외 추가
+1. 회원 가입 필드추가 및 예외 추가
 
 */
 

@@ -14,6 +14,9 @@ import com.example.appstore.Retrofit2.ApiResult
 import com.example.appstore.Utils
 import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.ItemScreenBinding
+import com.example.appstore.main.MainFragmentDirections
+import com.example.appstore.main.SearchFragment
+import com.example.appstore.main.SearchFragmentDirections
 
 class ScreenShotAdapter(private val model: MainViewModel,  private val screenShotes: List<String>, private val result: ApiResult, private val isClickEventEnabled: Boolean) :
     RecyclerView.Adapter<ScreenShotAdapter.ScreenShotViewHolder>() {
@@ -67,9 +70,11 @@ class ScreenShotAdapter(private val model: MainViewModel,  private val screenSho
             /* 상세페이지 - 스크린샷 클릭 -> 아무 반응 없음.  검색페이지 - 스크린샷 클릭 -> 상세페이지로 이동 */
             if(isClickEventEnabled) {
                 binding.comRowid.setOnClickListener {
-                    // ViewModel을 통해 선택한 데이터 전달
-                    model.setResult(result)
-                    it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
+                    // model.setResult(result)                     // ViewModel을 통해 선택한 데이터 전달
+                    // it.findNavController().navigate(R.id.action_searchFragment_to_detailFragment)
+
+                    val action = SearchFragmentDirections.actionSearchFragmentToDetailFragment(result)      // Navagation Safe Args
+                    it.findNavController().navigate(action)
                 }
             }
         }

@@ -77,6 +77,7 @@ class MainFragment : Fragment() {
     ): View? {
 
         binding = FragmentMainBinding.inflate(inflater, container, false)
+        binding.fragment = this     // Layout Data Binding
 
         page = 0       // API 호출 결과 페이지
         // 뷰 모델 프로바이더를 통해 뷰모델 가져오기
@@ -246,5 +247,23 @@ class MainFragment : Fragment() {
         endPosition = startPosition + 10
 
         model.moveTypeList("recomendList", startPosition, endPosition)     // API 검색 결과(ResultList) -> 마지막 검색 목록 결과(RecomendList) 10개씩 옮기기
+    }
+
+
+    /** 탭 내비게이션 */
+    fun navigateToTodayFragment(view: View) {
+        findNavController().navigate(R.id.action_mainFragment_to_todayFragment)
+    }
+
+    fun navigateToGameFragment(view: View) {
+        findNavController().navigate(R.id.action_mainFragment_to_gameFragment)
+    }
+
+    fun navigateToAppFragment(view: View) {
+        findNavController().navigate(R.id.action_mainFragment_to_appFragment)
+    }
+
+    fun navigateToArcadeFragment(view: View) {
+        findNavController().navigate(R.id.action_mainFragment_to_arcadeFragment)
     }
 }

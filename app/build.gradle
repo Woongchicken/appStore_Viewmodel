@@ -2,8 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
-    // id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 apply plugin: 'kotlin-kapt'
@@ -15,6 +15,7 @@ android {
     /* 뷰바인딩 설정 */
     buildFeatures {
         viewBinding true
+        dataBinding true
     }
 
     defaultConfig {
@@ -96,13 +97,4 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
-
-
-
-
-//    implementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-//    implementation("com.google.firebase:firebase-auth-ktx")
-
-
-
 }

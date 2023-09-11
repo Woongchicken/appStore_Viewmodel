@@ -16,6 +16,8 @@ import com.example.appstore.Utils
 import com.example.appstore.ViewModel.MainViewModel
 import com.example.appstore.databinding.ItemProgressBinding
 import com.example.appstore.databinding.ItemRecomendBinding
+import com.example.appstore.main.MainFragmentDirections
+import com.example.appstore.main.SearchFragmentDirections
 import java.text.FieldPosition
 
 
@@ -71,8 +73,11 @@ class RecomendAdapter(private val model: MainViewModel) :
 
 
             binding.comRowid.setOnClickListener {
-                model.setResult(result)
-                it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
+                // model.setResult(result)     // ViewModel을 통해 선택한 데이터 전달
+                // it.findNavController().navigate(R.id.action_mainFragment_to_detailFragment)
+
+                val action = MainFragmentDirections.actionMainFragmentToDetailFragment(result)       // Navagation Safe Args
+                it.findNavController().navigate(action)
             }
         }
     }

@@ -32,12 +32,29 @@
         <action
             android:id="@+id/action_mainFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
-        <argument
-            android:name="result"
-            app:argType="com.example.appstore.Retrofit2.ApiResult" />
         <action
             android:id="@+id/action_mainFragment_to_joinFragment"
             app:destination="@id/joinFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_todayFragment"
+            app:destination="@id/todayFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainFragment_to_gameFragment"
+            app:destination="@id/gameFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainFragment_to_appFragment"
+            app:destination="@id/appFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainFragment_to_arcadeFragment"
+            app:destination="@id/arcadeFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -84,6 +101,113 @@
             android:id="@+id/action_splashFragment_to_joinFragment"
             app:destination="@id/joinFragment"
             app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_todayFragment"
+            app:destination="@id/todayFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/appFragment"
+        android:name="com.example.appstore.sub.AppFragment"
+        android:label="fragment_app"
+        tools:layout="@layout/fragment_app" >
+        <action
+            android:id="@+id/action_appFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/appFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_appFragment_to_todayFragment"
+            app:destination="@id/todayFragment"
+            app:popUpTo="@id/appFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_appFragment_to_arcadeFragment"
+            app:destination="@id/arcadeFragment"
+            app:popUpTo="@id/appFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_appFragment_to_gameFragment"
+            app:destination="@id/gameFragment"
+            app:popUpTo="@id/appFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/arcadeFragment"
+        android:name="com.example.appstore.sub.ArcadeFragment"
+        android:label="fragment_arcade"
+        tools:layout="@layout/fragment_arcade" >
+        <action
+            android:id="@+id/action_arcadeFragment_to_todayFragment"
+            app:destination="@id/todayFragment"
+            app:popUpTo="@id/arcadeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_arcadeFragment_to_gameFragment"
+            app:destination="@id/gameFragment"
+            app:popUpTo="@id/arcadeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_arcadeFragment_to_appFragment"
+            app:destination="@id/appFragment"
+            app:popUpTo="@id/arcadeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_arcadeFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/arcadeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.example.appstore.sub.GameFragment"
+        android:label="fragment_game"
+        tools:layout="@layout/fragment_game" >
+        <action
+            android:id="@+id/action_gameFragment_to_todayFragment"
+            app:destination="@id/todayFragment"
+            app:popUpTo="@id/gameFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_gameFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/gameFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_gameFragment_to_appFragment"
+            app:destination="@id/appFragment"
+            app:popUpTo="@id/gameFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_gameFragment_to_arcadeFragment"
+            app:destination="@id/arcadeFragment"
+            app:popUpTo="@id/gameFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/todayFragment"
+        android:name="com.example.appstore.sub.TodayFragment"
+        android:label="fragment_today"
+        tools:layout="@layout/fragment_today" >
+        <action
+            android:id="@+id/action_todayFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/todayFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_todayFragment_to_gameFragment"
+            app:destination="@id/gameFragment"
+            app:popUpTo="@id/todayFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_todayFragment_to_appFragment"
+            app:destination="@id/appFragment"
+            app:popUpTo="@id/todayFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_todayFragment_to_arcadeFragment"
+            app:destination="@id/arcadeFragment"
+            app:popUpTo="@id/todayFragment"
             app:popUpToInclusive="true" />
     </fragment>
 

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.appstore.Adapter.ScreenShotAdapter
@@ -30,7 +31,10 @@ class DetailFragment : Fragment() {
 
         model = ViewModelProvider(requireActivity())[MainViewModel::class.java] // requireActivity() - 현재 Fragment가 속한 Activity의 참조를 반환
 
-        val result = model.result.value
+        // val result = model.result.value       // ViewModel을 통해 데이터 수신
+
+        val args: DetailFragmentArgs by navArgs()         // Navagation Safe Args
+        val result = args.result
 
         setInit(binding,result)  // 초기 셋팅
 
