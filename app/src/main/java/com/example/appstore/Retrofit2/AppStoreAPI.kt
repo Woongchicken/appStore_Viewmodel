@@ -6,5 +6,5 @@ import retrofit2.http.Query
 
 interface AppStoreAPI {
     @GET("/search")
-    fun getApp(@Query("term") term: String, @Query("media") media: String = "software", @Query("limit") limit: Int = 200): Call<SearchAppDataDto>
+    fun getApp(@Query("term") term: String, @Query("media") media: String = "software", @Query("limit") limit: Int = 50): Call<SearchAppDataDto>
 }

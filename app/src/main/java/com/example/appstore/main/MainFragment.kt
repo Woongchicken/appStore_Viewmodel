@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -169,11 +170,18 @@ class MainFragment : Fragment() {
         val currentFragment = this
         mainScope.launch {
             Utils.showLoadingFragment(currentFragment)     // 로딩 화면 표시
+            setTabColor()
             searchTermAuto()                    // 검색어 자동 완성
             setHistoryAdapter()            // 최근 검색어
             setRecomendAdapter()                // 마지막 검색 목록
             Utils.hideLoadingFragment()     // 작업이 완료되면 로딩 화면 숨김
         }
+    }
+
+    /** 탭 컬러설정 */
+    private fun setTabColor() {
+        binding.mainImg.setColorFilter(ContextCompat.getColor(requireContext(), R.color.appstore_primary))
+        binding.mainText.setTextColor(ContextCompat.getColor(requireContext(), R.color.appstore_primary))
     }
 
     /** 검색어 자동 완성 Adapter 세팅 */

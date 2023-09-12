@@ -86,11 +86,13 @@
                 android:gravity="center_horizontal"
                 android:layout_weight="1">
                 <ImageView
+                    android:id="@+id/appImg"
                     android:src="@drawable/app"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     app:tint="@color/appstore_gray"/>
                 <TextView
+                    android:id="@+id/appText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="앱"
